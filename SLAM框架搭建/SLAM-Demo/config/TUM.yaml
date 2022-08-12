@@ -1,0 +1,52 @@
+%YAML:1.0
+
+# image intput
+## KITTI/TUM/OTHER
+Image.Dataset   :  "TUM"
+Image.Path      :  "/media/chen/demo/Dataset/TUM/HandleSLAM/rgbd_dataset_freiburg1_desk/"
+Image.Mode      :  "RGBD"
+
+Image.ORB_Features : 1
+Image.SIFT_Features: 0
+Image.SURF_Features: 0
+
+Image.Resize: 0
+
+Pose.Path : "/home/chen/桌面/SLAM/SLAM-Demo/result/res.txt"
+
+# ======================================================
+
+# Camera calibration and distortion parameters (OpenCV)
+Camera.fx: 517.306408
+Camera.fy: 516.469215
+Camera.cx: 318.643040
+Camera.cy: 255.313989
+
+Camera.k1: 0.262383
+Camera.k2: -0.953104
+Camera.p1: -0.005358
+Camera.p2: 0.002628
+Camera.k3: 1.163314
+
+Camera.width : 640
+Camera.height: 480
+
+# Camera frames per second
+Camera.fps: 30.0
+
+# Close/Far threshold. Baseline times.
+ThDepth: 40
+
+# ======================================================
+
+# stereo baseline times fx
+Stereo.bf: 0
+# the Th of depth is 30m
+Stereo.th: 0
+# 0: SGBM
+Stereo.MatchingMethod: 0
+
+# ======================================================
+Opts.maxRansacIter : 20
+Opts.ErrorTH : 2
+

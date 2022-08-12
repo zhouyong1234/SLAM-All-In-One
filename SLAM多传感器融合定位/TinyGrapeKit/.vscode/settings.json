@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.tex": "cpp",
+        "*.tcc": "cpp"
+    }
+}

@@ -1,0 +1,9 @@
+<launch>
+  <node pkg="rviz" type="rviz" name="rviz" 
+    args="-d $(find ncd_parser)/demo/demo.vcg"/>
+  <node pkg="ncd_parser" type="ncd_parser" name="ncd_parser" output="screen"
+    args="$(find ncd_parser)/demo/QuadTree_Alog.alog">
+    <param name="rate" value="1.0"/>
+   </node>
+</launch>
+

@@ -1,0 +1,18 @@
+﻿<package>
+  <name>all_demo</name>
+  <version>2.0.0</version>
+  <description>ausim</description>
+  <author>ausim</author>
+  <maintainer email="ausim@ausim.com">ls</maintainer>
+
+  <license>ausim</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>rs_to_velodyne</run_depend>
+  <run_depend>rslidar_sdk</run_depend>
+  <run_depend>lego_loam</run_depend>
+
+
+  <export>
+  </export>
+</package>

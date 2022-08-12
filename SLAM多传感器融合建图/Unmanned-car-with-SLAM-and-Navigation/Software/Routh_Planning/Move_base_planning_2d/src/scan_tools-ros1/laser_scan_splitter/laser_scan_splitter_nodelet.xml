@@ -1,0 +1,9 @@
+<!-- Laser scan splitter nodelet publisher -->
+<library path="lib/liblaser_scan_splitter_nodelet">
+  <class name="laser_scan_splitter/LaserScanSplitterNodelet" type="LaserScanSplitterNodelet" 
+    base_class_type="nodelet::Nodelet">
+    <description>
+      Laser scan splitter nodelet publisher.
+    </description>
+  </class>
+</library>

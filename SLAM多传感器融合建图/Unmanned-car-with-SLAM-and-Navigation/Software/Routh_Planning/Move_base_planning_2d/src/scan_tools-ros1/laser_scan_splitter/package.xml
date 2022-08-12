@@ -1,0 +1,30 @@
+<package>
+  <name>laser_scan_splitter</name>
+  <version>0.3.3</version>
+  <description>
+    The laser_scan_splitter takes in a LaserScan message and splits it into a number of other LaserScan messages. Each of the resulting laser scans can be assigned an arbitrary coordinate frame, and is published on a separate topic.
+  </description>
+  <maintainer email="ccnyroboticslab@gmail.com">Ivan Dryanovski</maintainer>
+  <maintainer email="cjaramillo@gc.cuny.edu">Carlos</maintainer>
+
+  <url>http://wiki.ros.org/laser_scan_splitter</url>
+  <author>Ivan Dryanovski</author>
+  <author>William Morris</author>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/laser_scan_splitter_nodelet.xml" />
+  </export>
+
+</package>

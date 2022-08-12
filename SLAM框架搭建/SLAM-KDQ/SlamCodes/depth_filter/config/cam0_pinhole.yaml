@@ -1,0 +1,32 @@
+%YAML:1.0
+---
+model_type: PINHOLE
+camera_name: camera
+image_width: 752
+image_height: 480
+distortion_parameters:
+   k1: 0
+   k2: 0
+   p1: 0
+   p2: 0
+projection_parameters:
+   fx: 4.6894439430045497e+02
+   fy: 4.6967991177317680e+02
+   cx: 3.5308385782266549e+02
+   cy: 2.2974410036895023e+02
+
+Camera.Intrinisic: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [4.6894439430045497e+02, 0., 3.5308385782266549e+02,
+          0., 4.6967991177317680e+02, 2.2974410036895023e+02,
+          0., 0., 1. ]
+Camera.Distortion: !!opencv-matrix
+   rows: 1
+   cols: 4
+   dt: d
+   data: [0,0,0,0]
+Camera.IsFisheye : 0
+Camera.Width: 752
+Camera.Height: 480

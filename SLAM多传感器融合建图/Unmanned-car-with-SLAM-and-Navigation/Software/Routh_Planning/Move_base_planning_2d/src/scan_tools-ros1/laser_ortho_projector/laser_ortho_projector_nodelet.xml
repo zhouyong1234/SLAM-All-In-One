@@ -1,0 +1,9 @@
+<!-- Laser ortho projector nodelet publisher -->
+<library path="lib/liblaser_ortho_projector_nodelet">
+  <class name="laser_ortho_projector/LaserOrthoProjectorNodelet" type="LaserOrthoProjectorNodelet" 
+    base_class_type="nodelet::Nodelet">
+    <description>
+      Laser ortho projector nodelet publisher.
+    </description>
+  </class>
+</library>

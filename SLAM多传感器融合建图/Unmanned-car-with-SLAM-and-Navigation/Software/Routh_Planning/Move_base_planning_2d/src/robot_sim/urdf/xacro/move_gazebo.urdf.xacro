@@ -1,0 +1,44 @@
+<robot name="my_car_move" xmlns:xacro="http://wiki.ros.org/xacro">
+
+    <xacro:macro name="joint_trans" params="joint_name">
+        <!-- Transmission is important to link the joints and the controller -->
+        <transmission name="${joint_name}_trans">
+            <type>transmission_interface/SimpleTransmission</type>
+            <joint name="${joint_name}">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+            </joint>
+            <actuator name="${joint_name}_motor">
+                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
+                <mechanicalReduction>1</mechanicalReduction>
+            </actuator>
+        </transmission>
+    </xacro:macro>
+
+    <xacro:joint_trans joint_name="left_wheel2base_link" />
+    <xacro:joint_trans joint_name="right_wheel2base_link" />
+
+    <gazebo>
+        <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+            <rosDebugLevel>Debug</rosDebugLevel>
+            <publishWheelTF>true</publishWheelTF>
+            <robotNamespace>/</robotNamespace>
+            <publishTf>1</publishTf>
+            <publishWheelJointState>true</publishWheelJointState>
+            <alwaysOn>true</alwaysOn>
+            <updateRate>100.0</updateRate>
+            <legacyMode>true</legacyMode>
+            <leftJoint>left_wheel2base_link</leftJoint> 
+            <rightJoint>right_wheel2base_link</rightJoint> 
+            <wheelSeparation>${base_link_radius * 2}</wheelSeparation> 
+            <wheelDiameter>${wheel_radius * 2}</wheelDiameter> 
+            <broadcastTF>1</broadcastTF>
+            <wheelTorque>30</wheelTorque>
+            <wheelAcceleration>1.8</wheelAcceleration>
+            <commandTopic>cmd_vel</commandTopic> 
+            <odometryFrame>odom</odometryFrame> 
+            <odometryTopic>odom</odometryTopic> 
+            <robotBaseFrame>base_footprint</robotBaseFrame> 
+        </plugin>
+    </gazebo>
+
+</robot>

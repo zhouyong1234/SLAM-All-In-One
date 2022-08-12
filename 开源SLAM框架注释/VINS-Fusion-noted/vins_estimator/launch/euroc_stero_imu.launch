@@ -1,0 +1,7 @@
+<launch>
+    <arg name="config_file" default = "/root/code/vins-fusion/src/VINS-Fusion/config/euroc/euroc_stereo_imu_config.yaml" />
+    
+    <node name="vins_node" pkg="vins" type="vins_node" output="screen" args="$(arg config_file)">
+    </node>
+
+</launch>

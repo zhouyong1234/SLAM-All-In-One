@@ -1,0 +1,19 @@
+<launch>
+
+  <param name="/use_sim_time" value="true"/>
+
+  <node pkg="rviz" type="rviz" name="rviz" 
+    args="-d $(find polar_scan_matcher)/demo/demo.rviz"/>
+
+  <node pkg="rosbag" type="play" name="play" 
+    args="$(find polar_scan_matcher)/demo/demo.bag --delay=5 --clock"/>
+
+  <node pkg="polar_scan_matcher" type="psm_node" name="psm_node" output="screen">
+    <param name="max_error" value="0.20"/>
+    <param name="search_window" value="100"/>
+  </node>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" 
+    args="0.0 0.0 0.0 0 0 0 /base_link /laser 40" />
+
+</launch>

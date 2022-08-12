@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/touchair/gnss_ws/src/Unmanned-car-with-SLAM-and-Navigation'
+make: Leaving directory '/home/touchair/gnss_ws/src/Unmanned-car-with-SLAM-and-Navigation'
+ 
+make: *** No targets specified and no makefile found.  Stop.
+

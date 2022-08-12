@@ -1,0 +1,40 @@
+<!--
+Example launch file: launches the scan matcher with pre-recorded data
+-->
+
+<launch>
+  <arg name="IS_TWISTSTAMPED" default="true" />
+  <arg name="use_rviz" default="true" />
+  <arg name="publish_covariance" default="false"/>
+  #### set up data playback from bag #############################
+
+  <param name="/use_sim_time" value="true"/>
+  <param name="/stamped_vel" value="$(arg IS_TWISTSTAMPED)"/>
+
+  <group if="$(arg use_rviz)">
+    <node pkg="rviz" type="rviz" name="rviz"
+          args="-d $(find laser_scan_matcher)/demo/demo.rviz"/>
+  </group>
+
+  <node pkg="rosbag" type="play" name="play"
+    args="$(find laser_scan_matcher)/demo/demo.bag --delay=5 --clock"/>
+
+  #### publish an example base_link -> laser transform ###########
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser"
+    args="0.0 0.0 0.0 0.0 0.0 0.0 /base_link /laser 40" />
+
+  #### start the laser scan_matcher ##############################
+
+  <group if="$(arg publish_covariance)">
+    <param name="laser_scan_matcher_node/do_compute_covariance" value="1"/>
+    <param name="laser_scan_matcher_node/publish_pose_with_covariance" value="true"/>
+    <param name="laser_scan_matcher_node/publish_pose_with_covariance_stamped" value="true"/>
+  </group>
+  <node pkg="laser_scan_matcher" type="laser_scan_matcher_node"
+    name="laser_scan_matcher_node" output="screen">
+
+    <param name="max_iterations" value="10"/>
+  </node>
+
+</launch>

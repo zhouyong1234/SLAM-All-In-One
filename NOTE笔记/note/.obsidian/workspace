@@ -1,0 +1,102 @@
+{
+  "main": {
+    "id": "e76a9395b5275484",
+    "type": "split",
+    "children": [
+      {
+        "id": "a9e9126af16a6173",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "04 远程连接mobaxterm/xshell建议使用mobaxterm.md",
+            "mode": "source"
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "a7f003f677c1e021",
+    "type": "split",
+    "children": [
+      {
+        "id": "5f3b86de2c7db4f5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "42c81128c1291156",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "aef9467ba2a8fd3a",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "76d9dfe0e7061b63",
+    "type": "split",
+    "children": [
+      {
+        "id": "65a66edc1ad1a662",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f3327e172c4e9942",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "04 远程连接mobaxterm/xshell建议使用mobaxterm.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "active": "a9e9126af16a6173",
+  "lastOpenFiles": [
+    "04 远程连接mobaxterm/xshell建议使用mobaxterm.md",
+    "02 ROS2/02 ros2 安装与卸载.md",
+    "00 安装教程/PDF/捷联惯导算法与组合导航原理(教材).pdf",
+    "00 安装教程/PDF/06orb跑点云.pdf",
+    "03 机器人SLAM导航-技术与实现/03 惯性测量单元.md",
+    "03 机器人SLAM导航-技术与实现/01 ROS C++编译.md",
+    "03 机器人SLAM导航-技术与实现/09 视觉slam.md",
+    "03 机器人SLAM导航-技术与实现/img/Pasted image 20220112100024.png",
+    "03 机器人SLAM导航-技术与实现/img/QQ图片20220105102706.png",
+    "03 机器人SLAM导航-技术与实现/04 激光雷达.md"
+  ]
+}

@@ -1,0 +1,10 @@
+%YAML:1.0
+---
+stereo.stream: 0
+stereo.width: 640
+stereo.height: 480
+stereo.frame_rate: 90
+stereo.auto_exposure: 1
+stereo.exposure_time: 500
+stereo.exposure_gain: 100
+stereo.ae_point: 1500

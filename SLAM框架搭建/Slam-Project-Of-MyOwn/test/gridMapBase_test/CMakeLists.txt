@@ -1,0 +1,23 @@
+CMAKE_MINIMUM_REQUIRED( VERSION 3.12.2 )
+
+ADD_DEFINITIONS( -std=c++14 )
+
+#find required eigen
+FIND_PACKAGE( Eigen3 )
+
+#directory of eigen headers
+INCLUDE_DIRECTORIES( ${EIGEN3_INCLUDE_DIR} )
+
+
+SET( EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin" )
+
+AUX_SOURCE_DIRECTORY( ${PROJECT_SOURCE_DIR}/gridMapBase_test test_src )
+
+INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/../include" )
+
+LINK_DIRECTORIES( "${PROJECT_SOURCE_DIR}/../build/lib/" )
+
+ADD_EXECUTABLE( gridMapBaseTest ${test_src} )
+
+TARGET_LINK_LIBRARIES( gridMapBaseTest slam.a )
+

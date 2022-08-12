@@ -1,0 +1,10 @@
+<launch>
+        <arg name = "model_xacro" default = "$(find scout_description)/urdf/scout_v2.xacro" />
+        <arg name="model" />
+
+        <include file="$(find scout_description)/launch/description.launch" >
+                <arg name = "model_xacro" default = "$(arg model_xacro)" />
+        </include>
+
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(find scout_base)/rviz/model_display.rviz" />
+</launch>

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<package>
+  <name>scout_base</name>
+  <version>0.3.3</version>
+  <description>AgileX Scout robot driver</description>
+
+  <author email="ruixiang.du@westonrobot.com">Ruixiang Du</author>
+  <maintainer email="info@westonrobot.com">WestonRobot</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">TODO</url>
+  <url type="bugtracker">TODO</url>
+  <url type="repository">TODO</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>scout_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>roslaunch</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>ugv_sdk</build_depend>
+  <run_depend>controller_manager</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>scout_msgs</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>topic_tools</run_depend>
+  <run_depend>ugv_sdk</run_depend>
+  <export></export>
+</package>

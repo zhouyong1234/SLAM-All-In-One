@@ -1,0 +1,31 @@
+%YAML:1.0
+---
+imuFreq: 200
+imageFreq: 30
+simStart: 0
+simEnd: 5
+gyr_noise_sigma: 0.001
+acc_noise_sigma: 0.01
+gyr_bias_sigma: 0.0001
+acc_bias_sigma: 0.001
+pixel_noise: 2
+add_pixel_noise: 0
+camera_yaml: "/home/kdq/Workspace/SLAM/SLAM-KDQ/SlamCodes/viz_scene/config/cam0_pinhole.yaml"
+
+Tbc: !!opencv-matrix
+  rows: 4
+  cols: 4
+  dt: d
+  data: [-1.0,  0.,  0.,  0.,
+          0.0, 1.0,  0., 0.1,
+           0.,  0.,-1.0, 0.2,
+           0.,  0.,  0., 1.0]
+
+
+SimModel: !!opencv-matrix
+  rows: 3
+  cols: 6
+  dt: d
+  data: [2.0, 0.5, 0.0, 30.0, 0.5, 0.0,
+         0.2, 0.5, 0.0, 30.0, 0.5, 0.0,
+         10.0, 0.075,0.2, 30.0,0.075,0.0]

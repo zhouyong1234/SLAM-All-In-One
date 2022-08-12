@@ -1,0 +1,22 @@
+./run_euroc_slam \
+    -v /home/mou/cv_dataset/SLAM_Dataset/orb_vocab/orb_vocab.dbow2 \
+    -d /home/mou/eece5554_roboticssensing/Final_Project/ws_final/src/openvslam/example/mav0/ \
+    -c ../example/euroc/EuRoC_mono.yaml
+
+
+./run_video_slam -v /home/mou/cv_dataset/SLAM_Dataset/orb_vocab/orb_vocab.dbow2 -m /home/mou/cv_dataset/SLAM_Dataset/aist_factory_A_1/video.mp4 -c /home/mou/cv_dataset/SLAM_Dataset/aist_factory_A_1/config.yaml --frame-skip 3 --no-sleep --auto-term --map-db map.msg 
+
+
+./run_video_localization -v /home/mou/cv_dataset/SLAM_Dataset/orb_vocab/orb_vocab.dbow2 -m /home/mou/cv_dataset/SLAM_Dataset/aist_factory_A_2/video.mp4  -c /home/mou/cv_dataset/SLAM_Dataset/aist_factory_A_2/config.yaml --frame-skip 3 --no-sleep --auto-term --map-db map.msg
+
+
+rosrun openvslam run_slam \
+    -v /home/mou/cv_dataset/SLAM_Dataset/orb_vocab/orb_vocab.dbow2 \
+    -c /home/mou/cv_dataset/SLAM_Dataset/car_IR_RGB_lidar/calibration_info/config.yaml  --frame-skip 3 --no-sleep --auto-term --map-db map.msg 
+
+
+rosrun openvslam run_localization \
+    -v /home/mou/cv_dataset/SLAM_Dataset/orb_vocab/orb_vocab.dbow2 \
+    -c /home/mou/cv_dataset/SLAM_Dataset/aist_factory_A_2/config.yaml \
+    --map-db map.msg --frame-skip 3 --no-sleep --auto-term --map-db map.msg 
+

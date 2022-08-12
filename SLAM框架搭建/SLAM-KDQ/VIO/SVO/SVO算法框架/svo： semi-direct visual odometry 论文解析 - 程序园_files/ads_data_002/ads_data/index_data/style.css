@@ -1,0 +1,123 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+.ad {
+	position: relative;
+	top: 0;
+	left: 0;
+	width: 970px;
+	height: 250px;
+	background-color: #ffffff;
+	overflow: hidden;
+    cursor: pointer;   
+    opacity: 0;
+    
+}
+
+#content{
+	width: 970px;
+	height: 250px;
+	top: 0px;
+	left: 0px;
+	position: absolute;
+}
+
+.clickTag {
+	width: 970px;
+	height: 250px;
+	display: block;
+	position: absolute;
+	cursor: pointer;
+	left: 0px;
+	top: 0px;
+	z-index: 99;
+	background-color: rgba(255,255,255,0);
+	border: 1px solid #000000;
+    box-sizing: border-box; 
+}
+
+#bg{
+	position: absolute;
+    top: 0px;
+    left: 0px;
+	width: 970px;
+	height: 250px;
+	background-color: #ffffff;
+	opacity: 1;
+}
+#acura-logo, #frame1_copy1, #frame1_copy2, #frame1_copy3, #acura-logo-2, #cta, #acura-logo-2, #f2_ilx_logo, #frame3_copy1,#frame3_copy2, #frame4_copy1,#frame4_copy2, #disclaimer-copy{
+	position: absolute;
+    top: 0px;
+    left: 0px;
+	width: 970px;
+	height: 250px;
+	opacity: 0;
+}
+
+ #frame4-bg{
+	position: absolute;
+    top: -1px;
+    left: -1px;
+	width: 970px;
+	height: 250px;
+	opacity: 0;
+}
+#frame2-bg{
+	position: absolute;
+    top: -5px;
+    left: -1px;
+	width: 970px;
+	height: 250px;
+	opacity: 0;
+}
+#f2white_bg{
+	position: absolute;
+    top: 0px;
+    left: 0px;
+	width: 970px;
+	height: 250px;
+	background-color: #ffffff;	
+
+}
+
+#more-info {
+    position: absolute;
+    top: 133px;
+    left: 771px;
+    width: 78px;
+    height: 17px;
+    z-index: 100;
+    visibility: hidden;
+}
+#disclaimer-bg{
+	position: absolute;
+    top: 0px;
+    left: -0px;
+	width: 970px;
+	height: 250px;
+	opacity: 0;
+	visibility: hidden;
+	background-color: #000000;	
+	z-index: 100;
+}
+#delearName {
+    position: absolute;
+    right: 40px;
+    top: 161px;
+    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #000000;
+    line-height: 16px;
+    text-align: center;
+    width: 406px;
+}
+#f2mask{
+	position: absolute;
+	width: 480px;
+	height: 240px;
+	top: 5px;
+	left: 5px;
+	overflow: hidden;
+
+}

@@ -1,0 +1,25 @@
+---
+camera_extrinsics:
+  translation:
+    x: -0.09
+    y: 0
+    z: -0.612
+  rotation:
+    x: -0.5
+    y: 0.5
+    z: -0.5
+    w: 0.5
+
+camera_intrinsics:
+  P: [1.158033737075e+03, 9.600000000000e+02, 0.000000000000e+00, 1.158033737075e+03, 5.400000000000e+02, 0.000000000000e+00]
+
+lidar_extrinsics:
+  translation:
+    x: 0.0
+    y: 1.12
+    z: 2.31200003623962
+  rotation:
+    x: 0.0
+    y: 0.0
+    z: 0.706825
+    w: 0.707388

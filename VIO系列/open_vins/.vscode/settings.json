@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.tex": "cpp",
+        "*.ipp": "cpp",
+        "optional": "cpp",
+        "system_error": "cpp",
+        "*.tcc": "cpp",
+        "ostream": "cpp"
+    }
+}

@@ -1,0 +1,4 @@
+<launch>
+    <arg name="filename" value="$(find robot_sim)/map/nav" />
+    <node name="map_save" pkg="map_server" type="map_saver" args="-f $(arg filename)" />
+</launch>

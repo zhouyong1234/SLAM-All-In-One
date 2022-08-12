@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="zh-cn"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin">
+    <meta property="og:description" content="SVO详细解读 极品巧克力 前言 接上一篇文章《深度滤波器详细解读》。 SVO（Semi-Direct Monocular Visual Odometry）是苏黎世大学Scaramuzza教授的实验室">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SVO详细解读 - 极品巧克力 - 博客园</title>
+    <link id="favicon" rel="shortcut icon" href="https://common.cnblogs.com/favicon.ico?v=20200522" type="image/x-icon">
+    
+    <link rel="stylesheet" href="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/blog-common.css">
+    <link id="MainCss" rel="stylesheet" href="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/bundle-anothereon001.css">
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/bundle-anothereon001-mobile.css">
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/ilekoaiq/rss">
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/ilekoaiq/rsd.xml">
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/ilekoaiq/wlwmanifest.xml">
+    <script async="" src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/analytics.js"></script><script>
+        var currentBlogId = 405135;
+        var currentBlogApp = 'ilekoaiq';
+        var cb_enable_mathjax = false;
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'AnotherEon001';
+        var visitorUserId = '';
+    </script>
+        <script>
+            var currentPostDateAdded = '2018-04-15 09:08';
+        </script>
+    <script src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/jquery-2.js"></script>
+    <script src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/blog-common.js"></script>
+    
+    
+    
+<script src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/pubads_impl_2020082501.js" async=""></script><link rel="preload" href="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/integrator.js" as="script"><script type="text/javascript" src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/integrator.js"></script><link rel="preload" href="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/integrator_002.js" as="script"><script type="text/javascript" src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/integrator_002.js"></script></head>
+<body>
+    <a name="top"></a>
+    
+    <div id="wrapper">
+<div id="header">
+
+<div id="top">
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/ilekoaiq/">极品巧克力</a>
+</h1>
+<div id="subtitle">
+SLAM
+</div>
+</div>
+<div id="sub"><div class="BlogStats">随笔 - 
+8, 文章 - 
+0, 评论 - 
+45, 引用 - 
+0</div>
+
+</div>
+
+
+
+
+</div>
+<div id="main_container">
+<div id="main_content">
+<div id="content">
+	<div id="post_detail">
+    <div class="post">
+        <h2>
+            
+<a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/ilekoaiq/p/8659631.html">
+    <span>SVO详细解读</span>
+    
+
+
+</a>
+
+        </h2>
+        <div class="postbody">
+            
+<div id="cnblogs_post_body" class="blogpost-body">
+    <p style="text-align: center;"><span style="font-size: 22pt;"><strong>SVO详细解读 </strong></span></p>
+<p style="text-align: center;"><span style="font-size: 14pt;"><strong>极品巧克力</strong></span></p>
+<h2>前言</h2>
+<p><span style="font-size: 12pt;">接上一篇文章《深度滤波器详细解读》。 </span></p>
+<p><span style="font-size: 12pt;">SVO（Semi-Direct Monocular Visual 
+Odometry）是苏黎世大学Scaramuzza教授的实验室，在2014年发表的一种视觉里程计算法，它的名称是半直接法视觉里程计，通俗点说，就
+是结合了特征点法和直接法的视觉里程计。目前该算法已经在github上面开源（https://github.com/uzh-rpg
+/rpg_svo）。贺一家在它的开源版本上面进行改进，形成了SVO_Edgelet（https://github.com/HeYijia
+/svo_edgelet）。相比原版，SVO_Edgelet增加了一些功能，比如结合本质矩阵和单应矩阵来初始化，把边缘特征点加入跟踪等，对SVO
+的鲁棒性有非常大的改善。 </span></p>
+<p><span style="font-size: 12pt;">虽然SVO已经有论文[1]了，但是论文里面只是讲了最核心的算法理论，可以用论文来了解其算法思想。但是具体的实现方法和技巧，都隐藏在源代码里。要想彻底掌握它，并且在具体实践中灵活运用它，还是必须要阅读源代码才行。 </span></p>
+<p><span style="font-size: 12pt;">所以我通读了这2万多行的源代码，力求从代码中反推出所有的具体实现、算法、公式、技巧、作者的意图。 </span></p>
+<p><span style="font-size: 12pt;">源码之下，了无秘密。 </span></p>
+<p><span style="font-size: 12pt;">在把这2万多行的代码全部搞懂之后，我把代码里面的具体实现方法全都一五一十地还原出来，研究其优缺点、适用情况，探讨其可以改进的地方，总结成本文，与各位分享。</span></p>
+<p><span style="font-size: 12pt;">本文对应的程序为SVO_Edgelet。 </span></p>
+<p><span style="font-size: 12pt;">本文目标读者：对SVO有一定了解的SLAM算法工程师。 </span></p>
+<h2>流程图</h2>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192551966-693165405.png" alt=""></p>
+<h2>1.跟踪</h2>
+<p><span style="font-size: 12pt;">其实，SVO的跟踪部分的本质是跟ORBSLAM一样的，TrackWithMotionModel和TrackLocalMap，只是匹配的方法从特征点法改成了灰度值匹配法。 </span></p>
+<p><span style="font-size: 12pt;">但是，随后，与ORBSLAM有不同的地方，SVO在优化出相机位姿之后，还有可选项，可以再优化地图点，还可以再把地图点和相机位姿一起优化。 </span></p>
+<h3>1.1初始化</h3>
+<p><span style="font-size: 12pt;">图像刚进来的时候，就获取它的金字塔图像，5层，比例为2。 </span></p>
+<p><span style="font-size: 12pt;">然后处理第一张图像，</span><span style="color: black; font-family: 新宋体; font-size: 9pt;">processFirstFrame()</span><span style="font-size: 12pt;">。先检测FAST特征点和边缘特征。如果图像中间的特征点数量超过50个，就把这张图像作为第一个关键帧。 </span></p>
+<p><span style="font-size: 12pt;">然后处理第一张之后的连续图像，</span><span style="color: black; font-size: 9pt;"><span style="font-family: 新宋体;">processSecondFrame()</span><span style="font-family: 宋体;">，</span></span><span style="font-size: 12pt;">用于跟第一张进行三角初始化。从第一张图像开始，就用光流法持续跟踪特征点，把特征像素点转换成在相机坐标系下的深度归一化的点，并进行畸变校正,再让模变成1,映射到单位球面上面。 </span></p>
+<p><span style="font-size: 12pt;">如果匹配点的数量大于阈值，并且视差的中位数大于阈值。如果视差的方差大的话，选
+择计算E矩阵，如果视差的方差小的话，选择计算H矩阵。如果计算完H或E后，还有足够的内点，就认为这帧是合适的用来三角化的帧。根据H或E恢复出来的位
+姿和地图点，进行尺度变换，把深度的中值调为1。 </span></p>
+<p><span style="font-size: 12pt;">然后把这一帧，作为关键帧，送入到深度滤波器中。（就是送到的深度滤波器的
+updateSeedsLoop()线程中。深度滤波器来给种子点在极线上搜索匹配点，更新种子点，种子点收敛出新的候选地图点。如果是关键帧的话，就初
+始化出新的种子点，在这帧图像里面每层的每个25x25大小的网格里，取一个最大的fast点。在第0层图像上，找出canny边缘点。） </span></p>
+<p><span style="font-size: 12pt;">之后就是正常的跟踪</span><span style="color: black; font-family: 新宋体; font-size: 9pt;">processFrame()</span><span style="font-size: 12pt;">。 </span></p>
+<h3>1.2基于稀疏点亮度的位姿预估</h3>
+<p><span style="font-size: 12pt;">把上一帧的位姿作为当前帧的初始位姿。 </span></p>
+<p><span style="font-size: 12pt;">把上一帧作为参考帧。 </span></p>
+<p><span style="font-size: 12pt;">先创建n行16列的矩阵</span><span style="color: black; font-family: 新宋体; font-size: 9pt;">ref_patch_cache_</span><span style="font-size: 12pt;">，n表示参考帧上面的特征点的个数，16代表要取的图块的像素数量。 </span></p>
+<p><span style="font-size: 12pt;">再创建6行n*16列的矩阵</span><span style="color: black; font-family: 新宋体; font-size: 9pt;">jacobian_cache_</span><span style="font-size: 12pt;">。代表图块上的每个像素点误差对相机位姿的雅克比。 </span></p>
+<p><span style="font-size: 12pt;">要优化的是参考帧相对于当前帧的位姿。 </span></p>
+<p><span style="font-size: 12pt;">把参考帧上的所有图块结合地图点，往当前帧图像的金字塔图像上投影。在当前帧的金字塔图像上，从最高层开始，一层层往低层算。每次继承前一次的优化结果。如果前一次的误差相比前前次没有减小的话，就继承前前次的优化后的位姿。每层的优化，迭代30次。 </span></p>
+<p><span style="font-size: 12pt;">要优化的残差是，参考帧<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192552612-354032727.png" alt="">上的特征点的图块与投影到当前帧<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192552870-101344074.png" alt="">上
+的位置上的图块的亮度残差。投影位置是，参考帧中的特征点延伸到三维空间中到与对应的地图点深度一样的位置，然后投影到当前帧。这是SVO的一个创新点，
+直接由图像上的特征点延伸出来，而不是地图点（因为地图点与特征点之间也存在投影误差），这样子就保证了要投影的图块的准确性。延伸出来的空间点肯定也与
+特征点以及光心在一条直线上。这样子的针孔模型很漂亮。 </span></p>
+<p><span style="font-size: 12pt;">SVO的另外一个创新点是，以当前帧上的投影点的像素值为基准，通过优化调整参考帧投影过来的像素点的位置，以此来优化这两者像素值残差。这样子，投影过来的图块<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192553057-841704241.png" alt="">上的像素值关于像素点位置的雅克比，就可以提前计算并且固定了。（而以前普通的方法是，以参考帧投影过去的像素值为基准，通过优化投影点的位置，来优化这两者的残差。） </span></p>
+<p><span style="font-size: 12pt;">残差用公式表示为。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192553272-1369103630.png" alt=""></p>
+<p><span style="font-size: 12pt;">其中，<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192553453-455231773.png" alt="">表示半个图块的大小。 </span></p>
+<p><span style="font-size: 12pt;">把扰动加在<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192553631-751993440.png" alt="">上，也就是扰动参考帧<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192553818-806812679.png" alt="">相对于第<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192554009-200572999.png" alt="">帧的位姿。因为一般用左乘扰动，所以这里也用左乘扰动。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192554238-1800841648.png" alt=""></p>
+<p><span style="font-size: 12pt;">所以，残差关于扰动的雅克比为。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192554490-433204365.png" alt=""></p>
+<p><span style="font-size: 12pt;">级联求导，但是，这样子的话，每次迭代后，雅克比<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192554672-485874784.png" alt="">都会发生改变。一般情况下的优化，都会遇到这样的问题。 </span></p>
+<p><span style="font-size: 12pt;">所以，采用近似的思想。首先，认为空间点<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192554840-324514400.png" alt="">固定不动，只调整参考帧<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192555037-1301651058.png" alt="">的位姿，所以这个扰动不影响在当前帧上的投影点的位置，只会影响图块<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192555187-760085181.png" alt="">的内容。然后，参考帧在新的位姿上重新生成新的空间点，再迭代下去。虽然只是近似优化，但每次迭代的方向都是对的，假设步长也差不多，所以最终也可以优化成功。 </span></p>
+<p><span style="font-size: 12pt;">只是对公式优化的近似，抽象成如下的模型。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192555551-1318889448.png" alt="">&nbsp;<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180407165135654-2040219012.jpg" alt=""></p>
+<p><span style="font-size: 12pt;">如果两个相机是互相正对着的，并且地图点在两个相机光心连线的中心的话，那肯定是符合的，跟公式优化的效果是相同的。可以通过平行四边形定理证明。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180407165829372-1886247076.jpg" alt=""></p>
+<p><span style="font-size: 12pt;">两相机的法线相同；或两相机的法线相反，地图点到两相机光心的距离相同。那这样子调整，也是跟优化的效果相同的。可以通过相似三角形比例定理来证明，作一个辅助平面出来，地图点在这个平面上，这个平面过两个相机光心连线的中点。可以用相似三角形定理证明a等于b。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192556829-1090450242.png" alt=""> <img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192557110-1134305056.png" alt="">&nbsp;<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180407170604778-657563240.jpg" alt=""></p>
+<p><span style="font-size: 12pt;">但是，这种模型，只有在这种情况下（两相机的法线相同；或两相机的法线相反，地图点到两相机光心的距离相同），才跟优化相同。 </span></p>
+<p><span style="font-size: 12pt;">当不满足这种情况的时候，就会出现问题。比如，当地图点距离两个相机的差别很大的时候。按照公式优化，正确的优化结果应该是第4行，但是，按照这种近似的方法优化，优化的结果是第3行。所以，就与理想优化情况差别蛮大了。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192557747-271319850.png" alt=""><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180407172017922-1719429483.jpg" alt=""></p>
+<p><span style="font-size: 12pt;">而在SVO中是这样的情况，两个相机的法线方向相差不大，并且地图点离两个相机的光心都远大于光心距离，可以近似成地图点到两光心的距离是相等的。所以，在SVO中可以使用这个近似方法。 </span></p>
+<p><span style="font-size: 12pt;">当前的残差是这样的。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192558514-1108583669.png" alt=""></p>
+<p><span style="font-size: 12pt;">假设，给参考帧的相机位姿加个扰动<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192558718-1234878791.png" alt="">，变到<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192558961-863055198.png" alt="">的位姿，即 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192559172-359542849.png" alt=""></p>
+<p><span style="font-size: 12pt;">则残差与扰动的关系可以表达如下。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192559457-1642224359.png" alt=""></p>
+<p><span style="font-size: 12pt;">因为其中有个逆矩阵，这样子在求导时会不方便，所以，使用<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192559646-271984632.png" alt="">来代替，在算出<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192559818-926857180.png" alt="">之后再逆过去。至于为什么在这种情况下，在优化的时候可以用另一中形式的变量取代掉，在算出来后再变换回去，参考《优化过程的中间误差的传递》。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192559998-2134897003.png" alt=""></p>
+<p><span style="font-size: 12pt;">所以，原式就可以转换为。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192600230-1397372524.png" alt=""></p>
+<p><span style="font-size: 12pt;">然后，就可以计算雅克比了。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192600468-1459042900.png" alt=""></p>
+<p><span style="font-size: 12pt;">对于上一帧的每一个特征点，都进行这样的计算，在自己本来的层数上，取那个特征点
+左上角的4x4图块。如果特征点映射回原来的层数时，坐标不是整数，就进行插值，其实，本来提取特征点的时候，在这一层特征点坐标就应该是整数。把图块往
+这一帧的图像上的对应的层数投影，然后计算雅克比和残差。计算残差时，因为投影的位置并不刚好是整数的像素，所以会在投影点附近插值，获取与投影图块对应
+的图块。 </span></p>
+<p><span style="font-size: 12pt;">最后，得到一个巨大的雅克比矩阵，以及残差矩阵。但是为了节省存储空间，提前就转换成了H矩阵。<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192600748-1423602534.png" alt="">。 </span></p>
+<p><span style="font-size: 12pt;">用高斯牛顿法算出扰动<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192600939-1217434935.png" alt="">。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192601202-889810451.png" alt=""></p>
+<p><span style="font-size: 12pt;">然后，得到<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192601399-591893216.png" alt="">，逆矩阵得到<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192601561-1100813496.png" alt="">，再更新出<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192601754-789102489.png" alt="">。然后，在新的位置上，再从像素点坐标，投影出新的点<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192602031-1755113065.png" alt="">。 </span></p>
+<p><span style="font-size: 12pt;">每一层迭代30次。因为这种inverse-compositional方法，用这种近似的思想，雅克比就可以不用再重新计算了。（因为重新投影出新的<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192602238-20445462.png" alt="">点的位置，这个过程没有在残差公式里面表现出来。）这样子逐层下去，重复之前的步骤。 </span></p>
+<p><span style="font-size: 12pt;">对于每一个图块的每一个像素，它的雅克比计算如下。 </span></p>
+<p><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192602423-701480707.png" alt=""><span style="font-size: 12pt;">，是这个像素插值点在图像上的梯度，就是水平右边的像素点减去水平左边的像素点，竖直下边的像素点减去竖直上边的像素点。如下图所示。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192602765-2034943529.png" alt=""></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192602974-638691498.png" alt=""></p>
+<p><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192603179-1405134747.png" alt=""><span style="font-size: 12pt;">，算的是投影雅克比。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192603412-832375869.png" alt=""></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192603665-995562888.png" alt=""></p>
+<p><span style="font-size: 12pt;">为了方便计算，虽然<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192603865-789503545.png" alt="">，但因为<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192604037-804426806.png" alt="">是一个很小的扰动，所以可以认为<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192604209-1897507120.png" alt="">,<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192604422-800718315.png" alt="">。所以，后两项就可以相乘，统一用<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192604611-410976883.png" alt="">来表示了。可以认为<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192604807-1766311835.png" alt="">。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192605066-811207194.png" alt=""></p>
+<p><span style="font-size: 12pt;">对于每一个特征点，根据像素位置算出<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192605257-1927075212.png" alt="">，再根据反投影出来的空间点位置<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192605410-1006369623.png" alt="">算出上式的左边项，根据特征点所在的层数算出<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192605573-1766960649.png" alt="">。然后，相乘，就得到了一行雅克比矩阵。再根据<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192605738-1572907630.png" alt="">，<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192605898-1607460552.png" alt="">，加到H矩阵和残差矩阵上。 </span></p>
+<p><span style="font-size: 12pt;">最后，在优化出<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192606097-397037678.png" alt="">后，应该是这样更新，<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192606309-661597478.png" alt="">。 </span></p>
+<p><span style="color: red; font-size: 12pt;">但是，在程序里面，直接就是，<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192606527-1871870760.png" alt="">。可能是为了加快计算，认为<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192606780-343097194.png" alt="">。
+在sparse_align.cpp的307行，T_curnew_from_ref = T_curold_from_ref * 
+SE3::exp(-x_); 这个地方，为什么不是 T_curnew_from_ref = T_curold_from_ref * 
+(SE3::exp(x_)).inverse(); 需要以后研究一下。 </span></p>
+<p><span style="font-size: 12pt;">这样子，就可以得到当前帧的位姿。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192606957-1609582604.png" alt=""></p>
+<h3>1.3基于图块的特征点匹配</h3>
+<p><span style="font-size: 12pt;">因为当前帧有了1.1的预估的位姿。对于关键帧链表里面的那些关键帧，把它们图像
+上的分散的5点往当前帧上投影，看是否能投影成功，如果能投影成功，就认为共视。再把所有的共视关键帧，按照与当前帧的距离远近来排序。然后，按照关键帧
+距离从近到远的顺序，依次把这些关键帧上面的特征点对应的地图点都往当前帧上面投影，同一个地图点只被投影一次。如果地图点在当前帧上的投影位置，能取到
+8x8的图块，就把这个地图点存入到当前帧投影位置的网格中。 </span></p>
+<p><span style="font-size: 12pt;">再把候选地图点都往当前帧上投影，如果在当前帧上的投影位置，能取到8x8的图块，就把这个候选地图点存入到当前帧投影位置的网格中。如果一个候选点有10帧投影不成功，就把这个候选点删除掉。 </span></p>
+<p><span style="font-size: 12pt;">然后，对于每一个网格，把其中对应的地图点，按照地图点的质量进行排序（TYPE_GOOD&gt; TYPE_UNKNOWN&gt; TYPE_CANDIDATE&gt; TYPE_DELETED）。如果是TYPE_DELETED，则在网格中把它删除掉。 </span></p>
+<p><span style="font-size: 12pt;">遍历网格中的每个地图点，找到这个地图点被观察到的所有的关键帧。获取那些关键帧
+光心与这个地图点连线，与，地图点与当前帧光心连线，的夹角。选出夹角最小的那个关键帧作为参考帧，以及对应的特征点。（注意，这里的这种选夹角的情况，
+是只适合无人机那样的视角一直朝下的情况的，应该改成ORBSLAM那样，还要再把视角转换到对应的相机坐标系下，再筛选一遍）。这个对应的特征点，必须
+要在它自己的对应的层数上，能获取10x10的图块。 </span></p>
+<p><span style="font-size: 12pt;">然后，计算仿射矩阵。首先，获取地图点在参考帧上的与光心连线的模。然后它的对应
+的特征点，在它对应的层数上，取右边的第5个像素位置和下边的第5个像素位置，再映射到第0层。再转换到单位球上，再映射到三维空间中，直到与地图点的模
+一样的长度。把对应的特征点也映射到三维空间中，直到与地图点的模一样的长度。然后，再把这3个点映射到当前帧的（有畸变的）图像上。根据它们与中心投影
+点的位置变换，算出了仿射矩阵A_cur_ref。A_cur_ref.col(0) = (px_du - 
+px_cur)/halfpatch_size; A_cur_ref.col(1) = (px_dv - 
+px_cur)/halfpatch_size;。（www.cnblogs.com/ilekoaiq）仿射矩阵A，就是把参考帧上的图块在它自己对应
+的层数上，转换到当前帧的第0层上。（这种把比例变换转换成矩阵表示的方法，很好）。 </span></p>
+<p><span style="font-size: 12pt;">然后，计算在当前帧的目标搜索层数。通过计算仿射矩阵A_cur_ref的行列式，其实就是面积放大率。如果面积放大率超过3，就往上一层，面积放大率变为原来的四分之一。知道面积放大率不再大于3，或者到最高层。就得到了目标要搜索的层数。 </span></p>
+<p><span style="font-size: 12pt;">然后，计算仿射矩阵的逆仿射矩阵A_ref_cur。然后，这样子，如果以投影点
+为中心（5,5），取10x10的图块，则图块上每个像素点的（相对中心点的）位置，都可以通过逆仿射矩阵，得到对应的参考帧上的对应层数图像上的（相对
+中心点的）像素位置。进行像素插值。就是，把参考帧上的特征点附近取一些像素点过来，可以组成，映射到当前帧上的对应层数的投影点位置的附近，这些映射到
+的位置刚好组成10x10的图块。 </span></p>
+<p><span style="font-size: 12pt;">然后，从映射过来的10x10的图块中取出8x8的图块，作为参考图块。对这个图块的位置进行优化调整，使得它与目标位置的图块最匹配。残差表达式为。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192607169-1510207335.png" alt=""></p>
+<p><span style="font-size: 12pt;">其中，<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192607357-2118880184.png" alt="">表示这个像素点对应的残差，<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192607567-1057612151.png" alt="">表示在这个像素点对应的当前图像上的对应图块的位置，<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192607752-958678549.png" alt="">表示这个像素点在参考图块上的位置，<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192607938-454351595.png" alt="">表示两个图块的均值差。 </span></p>
+<p><span style="font-size: 12pt;">在这里，SVO有两个创新点。 </span></p>
+<p><span style="font-size: 12pt;">第一个创新的地方是。因为一般情况下，是基于自己图块不变，通过优化<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192608130-1840462170.png" alt="">使得投影位置的图块跟自己最接近。而SVO是投影位置的图块不变，通过优化<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192608283-1216385180.png" alt="">使
+得自己图块与投影位置的图块最接近。这样的话，就可以避免重复计算投影位置图块像素关于位置的雅克比了。因为自己图块是固定的，所以雅克比是固定的，所以
+只需要计算一次。其实，这个创新点与1.2中的反向创新点一样，都是用近似优化的方法来。因为，如果是一般的方法的话，计算目标投影位置的图块的雅克比，
+是知道自己参考图块重新移动后，会遇到怎样的目标图块。而，这个反向的方法，并不知道重新移动后会遇到怎样的图块，只知道移动后，对当前的目标图块可以匹
+配得更好。也是一种迭代，近似优化的方法，但速度可以块很多，避免了重复计算雅克比。 </span></p>
+<p><span style="font-size: 12pt;">第二个创新的地方是。一般情况下，两图块的均值差<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192608461-2017512070.png" alt="">，都是直接把两个图块的均值相减的。但是，这样子的话，可能容易受某些极端噪声的影响。所以，SVO中，直接把<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192608614-1434701467.png" alt="">也作为优化变量了。 </span></p>
+<p><span style="font-size: 12pt;">于是，雅克比可以计算如下。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192608798-1795224797.png" alt=""></p>
+<p><span style="font-size: 12pt;">其中，<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192609058-2028924565.png" alt="">就是参考图块上的雅克比。这个点的像素值关于位置（横坐标，纵坐标）的雅克比，其实就是这个点的右左像素值相减和下上像素值相减，得到的梯度。 </span></p>
+<p><span style="font-size: 12pt;">对这个图块上的所有的像素点都进行这样的操作。然后用高斯牛顿法进行迭代。最多迭代10次，如果某次调整位置的模小于0.03，就认为收敛了，退出迭代。得到最佳匹配点的位置。认为匹配成功。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192609269-164927781.png" alt=""></p>
+<p><span style="font-size: 12pt;">而，如果是对于那些边缘上的点。则只在梯度方向上进行调整，只调整这1个维度，即梯度方向上的长度。右左下上像素的变化，映射到梯度方向上，得到在梯度方向上的像素变化。最后优化完后，再从这个维度上映射出横纵坐标。最后，也得到最佳匹配点的位置。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192609648-301823369.png" alt=""></p>
+<p><span style="font-size: 12pt;">上面的优化，必须在1.2估算出的位姿较准确的情况下，才能使用这样的方法，在预测的投影点位置用像素梯度来优化出最佳匹配点位置。 </span></p>
+<p><span style="font-size: 12pt;">如果是一个TYPE_UNKNOWN类型的地图点，它找匹配失败的次数大于15次，就把它变为delete类型的点。如果是一个TYPE_CANDIDATE类型的点，它匹配失败的次数大于30次，就把它变为delete类型的点。 </span></p>
+<p><span style="font-size: 12pt;">如果匹配成功的话，就在当前图像上，新生成一个特征点（包括坐标和层数），特征点指向那个地图点。如果对应的参考帧上的特征点是边缘点的话，则新的特征点的类型也设为边缘点，把梯度也仿射过来，归一化后，作为这个新特征点的梯度。 </span></p>
+<p><span style="font-size: 12pt;">每个网格里，只要有一个地图点匹配成，就跳出这个网格的遍历循环。如果有180个网格匹配成功了，直接跳出所有网格的循环。循环结束后，如果成功匹配的网格的数量小于30个，就认为当前帧的匹配失败。 </span></p>
+<h3>1.4进一步优化位姿</h3>
+<p><span style="font-size: 12pt;">然后，对于1.3中的，当前帧上的所有的新的特征点<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192609834-1598402973.png" alt=""> ，如果它指向的是地图点<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192609992-1880307031.png" alt="">的话，通过优化当前帧的相机位姿<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192610150-1413010069.png" alt="">，使得地图点的在对应的层数上的预测投影位置和最佳匹配位置的残差<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192610330-993191006.png" alt="">最小。注意，是在对应层数上的残差。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192610543-1075287187.png" alt=""></p>
+<p><span style="font-size: 12pt;">雅克比为<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192610741-1669527212.png" alt="">。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192610961-2087781013.png" alt=""></p>
+<p><span style="font-size: 12pt;">上式结果中的<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192611171-1008203599.png" alt="">。 </span></p>
+<p><span style="font-size: 12pt;">程序里为了计算方便，优化公式<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192611353-893057132.png" alt="">的左右两边都约掉第0层的<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192611535-643391493.png" alt="">，所以就只剩下1.0 / (1&lt;&lt;(*it)-&gt;level)了，右边也只需要算到单位平面再乘以1.0 / (1&lt;&lt;(*it)-&gt;level)就可以了。 </span></p>
+<p><span style="font-size: 12pt;">如果是边缘点的话，则把重投影误差映射到梯度方向上。 </span></p>
+<p><span style="font-size: 12pt;">使用了核函数TukeyWeightFunction，根据误差的模来调整误差的权重。Tukey's hard re-descending function，<a href="http://en.wikipedia.org/wiki/Redescending_M-estimator">http://en.wikipedia.org/wiki/Redescending_M-estimator</a>。 </span></p>
+<p><span style="font-size: 12pt;">用高斯牛顿法来优化。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192611745-166443211.png" alt=""></p>
+<p><span style="font-size: 12pt;">然后，程序里，通过误差平方和的值是否变大，来判断这次优化是否有效。（但是，这个误差平方和是在优化之前的，程序里可能写错了，应该在优化之后再算误差平方和。） </span></p>
+<p><span style="font-size: 12pt;">总共优化迭代10次，如果某次优化量约等于0，则跳出优化循环。 </span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 12pt;">优化结束后，接下来，要算这个算出来的位姿的协方差，即增加的扰动<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192611922-1812280031.png" alt="">的协方差，就是对应的高斯分布里面的那个协方差。这里，可以通过高斯分布，转换出位姿的协方差。因为，参考卡尔曼滤波的状态转移方程，协方差，也是会随着状态转移矩阵而改变的。假设，在对应的层数上，测量值的协方差都为1个像素，即测量值满足方差为1的高斯分布。即<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192612081-1845606059.png" alt="">（如果是其它方差的话，改成<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192612298-121170806.png" alt="">，同样代入下面的公式即可），要求<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192612504-1081608687.png" alt="">。 </span></p>
+<p><span style="font-size: 12pt;">根据<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192612764-1397981192.png" alt="">，得出， </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192612963-107626744.png" alt=""></p>
+<p><span style="font-size: 12pt;">最后，如果有些点的的重投影误差，映射到第0层上，模大于2个像素的话，则把这个特征点指向地图点的指针赋值为空。如果最后剩下的匹配成功点的数量大于20个，就认为优化成功。 </span></p>
+<h3>1.5优化地图点</h3>
+<p><span style="font-size: 12pt;"> 就是optimizeStructure。在程序里，用nth_element找出前20个，最近一次优化帧的id，离当前帧id较远的，地图点。 </span></p>
+<p><span style="font-size: 12pt;">针对每个地图点，优化地图点的三维位置，使得它在它被观察到的每个关键帧上的重投
+影误差最小。每个地图点优化5次。如果这次优化的误差平方和小于上次优化的误差平方和，就接受这次的优化结果。（注意，这里的平方和也是在优化之前算的，
+其实应该在优化之后算）。如果是边缘点的话，则把重投影误差映射到梯度方向上，成为梯度方向上的模，就是与梯度方向进行点积。相应的，雅克比也左乘对应的
+梯度方向。相当于是，优化重投影误差在梯度方向上的映射。 </span></p>
+<p><span style="font-size: 12pt;">对于普通点，把扰动<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192613146-1135875518.png" alt="">加在三维坐标<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192613322-869604624.png" alt="">上，重投影误差为， </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192613505-912810579.png" alt=""></p>
+<p><span style="font-size: 12pt;">雅克比为<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192613691-1045571482.png" alt="">，</span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180407175630117-1248838127.png" alt=""></p>
+<p><span style="font-size: 12pt;">所以，根据<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192614143-1961163064.png" alt="">，用高斯牛顿法来进行计算。在程序里，为了计算方便，<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192614316-1562695827.png" alt="">的左右两边，都约去了对应层数的<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192614491-308049286.png" alt="">，所以，右边就只需要算到深度为1的平面上的残差就可以。 </span></p>
+<p><span style="font-size: 12pt;">如果是边缘点的话，则上式的左右两边都要乘以梯度的转置。<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192614676-1193056287.png" alt="">。也用高斯牛顿法来算。 </span></p>
+<h3>1.6 BA</h3>
+<p><span style="font-size: 12pt;">SVO里面有个选项，可以开启使用g2o的BA功能。 </span></p>
+<p><span style="font-size: 12pt;">如果开启使用这个功能的话，则在一开始的两张图像初始化之后，两张图像以及初始化出来的地图点，会用BA来优化。用的是g2o里面的模板。 </span></p>
+<p><span style="font-size: 12pt;">另外，会在1.5优化完地图点后，对窗口里的所有的关键帧和地图点，或者全局关键帧和地图点，进行优化。用的是g2o里面的模板。 </span></p>
+<h3>1.7对畸变图像处理的启发</h3>
+<p><span style="font-size: 12pt;">SVO的跟踪都是在畸变的鱼眼图像上跟踪的，没有对图像进行校正，这样子可以尽可能地保留图像的原始信息。 </span></p>
+<p><span style="font-size: 12pt;">又因为在1.2中的逆向图块雅克比的方法，除了可以加快计算外，还避免了对畸变参数的雅克比计算。因为如果用正向图像雅克比的话，在计算雅克比的时候，必须要把畸变参数也考虑进来。 </span></p>
+<p><span style="font-size: 12pt;">而在1.3中，图块匹配就是用畸变的图块取匹配的，保证了准确性。为了避免对畸变参数的雅克比计算，在匹配完成后，把投影点位置和匹配点位置都从畸变的图像上，转换到了单位平面上。以后在畸变图像上，计算重投影误差，就用这样的方法。 </span></p>
+<h2>2.创建地图点</h2>
+<p><span style="font-size: 12pt;">特征点提取的方法，放在了地图线程里。因为与ORBSLAM不同的是，它跟踪的时候，不需要找特征点再匹配，而是直接根据图块亮度差匹配的。 </span></p>
+<p><span style="font-size: 12pt;">而如果是vins的话，也可以参考这个方法，把特征点提取放到地图线程里，连续帧之间的特征点用光流匹配。但光流要求帧与帧之间不能差别太大。 </span></p>
+<p><span style="font-size: 12pt;"> 而在SVO中，后端的特征点是只在关键帧上提取的，用FAST加金字塔。而上一个关键帧的特征点在这一个关键帧上找匹配点的方法，是用极线搜索，寻找亮度差最小的点。最后再用depthfilter深度滤波器把这个地图点准确地滤出来。 </span></p>
+<p><span style="font-size: 12pt;"> 选取30个地图点，如果这30个地图点在当前帧和最近一个关键帧的视差的中位数大于40，或者与窗口中的关键帧的距离大于一定阈值，就认为需要一个新的关键帧。然后把当前帧设置为关键帧，对当前帧进行操作。 </span></p>
+<h3>2.1初始化种子</h3>
+<p><span style="font-size: 12pt;">当关键帧过来的时候，对关键帧进行处理。在当前图像上，划分出25像素*25像素的网格。 </span></p>
+<p><span style="font-size: 12pt;">首先，当前帧上的这些已经有的特征点，占据住网格。 </span></p>
+<p><span style="font-size: 12pt;">在当前帧的5层金字塔上，每层头提取fast点，首先用3x3范围的非极大值抑制。然后，对剩下的点，全部都计算shiTomasi分数，有点像Harris角点里面的那个分数。再全部映射到第0层的网格上，每个网格只保留分数最大的，且大于阈值的那个点。 </span></p>
+<p><span style="font-size: 12pt;">找边缘点的话，都只在第0层上面找。同样也是画网格，然后再每个网格中找
+canny线，然后对于网格中的在canny线上的点，计算它的梯度的模，保留模梯度最大的那个点，作为边缘点。梯度方向是二维的，就是这个点的右左下上
+梯度。程序里用了cv::Scharr结合cv::magnitude来快速算出所有点的横纵方向的梯度。 </span></p>
+<p><span style="font-size: 12pt;">然后，对于所有的新的特征点，初始化成种子点。用高斯分布表示逆深度。均值为最近的那个点的深度的倒数。深度范围为当前帧的最近的深度的倒数，即1.0/depth_min。高斯分布的标准差为1/6*1.0/depth_min。 </span></p>
+<h3>2.2更新种子，深度滤波器</h3>
+<p><span style="font-size: 12pt;">如果新来一个关键帧，或者是当前的普通的帧，或者之前的关键帧，用于更新种子点。对于每个种子点，通过正负1倍标准差，确定逆深度的搜索范围。这些参数都是对应种子点在它自己被初始化的那一帧。 </span></p>
+<p><span style="font-size: 12pt;">然后把深度射线上的最短和最长的深度，映射到当前帧的单位深度平面上，其实就得到的在单位平面上的极线线段。然后，再把逆深度的均值对应的深度，映射到当前帧，就是跟1.3中的同样的方法，得到图块仿射矩阵，和最佳搜索层数。 </span></p>
+<p><span style="font-size: 12pt;">（对于边缘点，如果把梯度仿射过来后，梯度的方向与极线方向的夹角大于45度，就认为沿着极线找，图块像素也不会变化很大，就不搜索了，直接返回false。） </span></p>
+<p><span style="font-size: 12pt;">把极线线段投影到对应的层数上，如果两个端点间的像素距离小于2个像素，就直接进行优化位置。用的是1.3中的找图块匹配的方法，把对应的图块映射过来。找到最佳匹配位置后，进行三角定位。三角定位的方法参考《视觉SLAM十四讲》的三角定位，矩阵分块计算。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192614921-2085561159.png" alt=""></p>
+<p><span style="font-size: 12pt;">如果两个端点间像素距离大于2个像素，就在极线上进行搜索。首先，确定总步长数，
+以两端点间的距离除以0.7，得到总步长数n_steps。然后，把单位深度平面上的极线线段分n_steps段，从一个端点开始往另外一个端点走，每走
+一步，就把位置投影（包括畸变）到对应层数的图像上，坐标取整后，获取图块。（这里可以改进，不应该对坐标进行取整，而应该改成插值）。然后，计算投影过
+来的图块与投影位置图块的相似度，相似度的计算公式如下，其中有消除均值的影响。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192615144-1816765042.png" alt=""></p>
+<p><span style="font-size: 12pt;">如果分数小于阈值，就认为两个图块是相似的。在当前位置，再进行优化位置，用的是1.3中的找图块匹配然后优化位置的方法。然后再进行三角定位。 </span></p>
+<p><span style="font-size: 12pt;">接下来，计算这个三角定位出来的深度值的协方差。用的是《视觉SLAM十四讲》的深度滤波。假设，在图像上的测量协方差为1个像素，则这个协方差的传递到深度上的过程如下。这个传递的，都还是标准差<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192615324-649580385.png" alt="">，而不是<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192615492-289483299.png" alt="">。 </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192615724-916674875.png" alt=""></p>
+<p><span style="font-size: 12pt;">再把这个协方差传递到逆深度上。假设这时候三角定位出来的深度值为<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192615911-1937512250.png" alt="">，则在逆深度上的标准差<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192616094-858046516.png" alt="">为， </span></p>
+<p style="text-align: center;"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192616313-1956306884.png" alt=""></p>
+<p><span style="font-size: 12pt;">所以，这个测量出来的深度，满足的分布为<img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180327192616535-320548764.png" alt="">。然后，就是更新种子点的深度分布了，参考《深度滤波器详细解读》。<span style="color: red;">但是在DepthFilter.cpp的486-490行对系数进行平均了。这里与depthfilter的论文里推导的不一样。可能这里程序写错了，应该改成和论文里面一样。</span> </span></p>
+<p><span style="font-size: 12pt;">如果种子点的方差，小于深度范围/200的时候，就认为收敛了，它就不再是种子
+点，而是candidate点。candidate点被成功观察到1次，就变成UNKNOW点。UNKNOW被成功观察到10次，就变成GOOD点。如果
+多次应该观察而没有被观察到，就变成DELETE点。 </span></p>
+<h2>3.重定位</h2>
+<p><span style="font-size: 12pt;">SVO中重定位，实现很简单，就是在跟丢之后，仍然假设当前帧的位姿和前一帧一样，往这个位姿上投地图点，用第1部分中的方法去优化计算，如果优化成功，就重定位回来，如果优化不成功，就继续下一帧。所以，在跟丢后，只能再回到跟丢时的位置，才能重定位回来。 </span></p>
+<p><span style="font-size: 12pt;">这样子实现重定位的方法很简单，可重定位的效果就很差了。这地方可以进行改进。 </span></p>
+<h2>4.总结</h2>
+<p><span style="font-size: 12pt;">SVO的定位很好，抖动很小。尤其在重复纹理的环境中，表现得比基于特征点法的ORBSLAM2要出色。 </span></p>
+<p><span style="font-size: 12pt;">将来可以在上面增加更鲁棒的重定位，回环闭环，全局地图的功能，来满足更多的实际应用场景，比如室内机器人、无人机、无人车。</span></p>
+<p>&nbsp;</p>
+<h2>5.求赞赏</h2>
+<p>&nbsp;</p>
+<p><span style="font-size: 16px;">您觉得，本文值多少？&nbsp;</span></p>
+<p>&nbsp;</p>
+<p><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180407001221081-397284790.jpg" alt=""></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h2>6.参考文献</h2>
+<ol>
+<li>
+<div style="text-align: justify;"><span style="color: #222222; font-family: Times New Roman; font-size: 10pt; background-color: white;">Forster
+ C, Pizzoli M, Scaramuzza D. SVO: Fast semi-direct monocular visual 
+odometry[C]// IEEE International Conference on Robotics and Automation. 
+IEEE, 2014:15-22.</span></div>
+</li>
+<li>
+<div style="text-align: justify;"><span style="color: #222222; font-size: 10pt;"><span style="font-family: 宋体; background-color: white;">高翔</span><span style="font-family: Times New Roman; background-color: white;">.</span><span style="font-family: 宋体; background-color: white;">视觉</span><span style="font-family: Times New Roman; background-color: white;">SLAM</span><span style="font-family: 宋体; background-color: white;">十四讲</span><span style="font-family: Times New Roman; background-color: white;">[M].</span><span style="font-family: 宋体; background-color: white;">北京</span><span style="font-family: Times New Roman; background-color: white;">:</span><span style="font-family: 宋体; background-color: white;">电子工业出版社</span><span style="font-family: Times New Roman; background-color: white;">,2017.</span></span></div>
+</li>
+</ol>
+<h2>&nbsp;</h2>
+<p style="text-align: right;"><span style="font-size: 16px;">&nbsp;</span></p>
+</div>
+<div id="MySignature"></div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(8659631,cb_blogId,1);green_channel_success(this,'谢谢推荐！');">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('6f40e42c-007a-e411-b908-9dcfd8948a71');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/ilekoaiq/" target="_blank"><img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/20180406161953.png" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/ilekoaiq/">极品巧克力</a><br>
+            <a href="https://home.cnblogs.com/u/ilekoaiq/followees/">关注 - 1</a><br>
+            <a href="https://home.cnblogs.com/u/ilekoaiq/followers/">粉丝 - 79</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a href="javascript:void(0);" onclick="follow('6f40e42c-007a-e411-b908-9dcfd8948a71');return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(8659631,'Digg')">
+        <span class="diggnum" id="digg_count">0</span>
+    </div>
+    <div class="buryit" onclick="votePost(8659631,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a href="https://www.cnblogs.com/ilekoaiq/p/8228324.html" class="p_n_p_prefix">« </a> 上一篇：    <a href="https://www.cnblogs.com/ilekoaiq/p/8228324.html" title="发布于 2018-04-15 21:04">深度滤波器详细解读</a>
+    <br>
+    <a href="https://www.cnblogs.com/ilekoaiq/p/8836970.html" class="p_n_p_prefix">» </a> 下一篇：    <a href="https://www.cnblogs.com/ilekoaiq/p/8836970.html" title="发布于 2018-04-15 21:10">VINS-mono详细解读</a>
+
+</div>
+</div>
+        </div>
+        <p class="postfoot">
+            posted on 
+<span id="post-date">2018-04-15 21:08</span>&nbsp;
+<a href="https://www.cnblogs.com/ilekoaiq/">极品巧克力</a>&nbsp;
+阅读(<span id="post_view_count">11676</span>)&nbsp;
+评论(<span id="post_comment_count">0</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=8659631" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(8659631);return false;">收藏</a>
+        </p>
+    </div>
+</div>
+
+<script src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/highlight.js"></script>
+<script>markdown_highlight();</script>
+<script>
+    var allowComments = true, cb_blogId = 405135, cb_blogApp = 'ilekoaiq', cb_blogUserGuid = '6f40e42c-007a-e411-b908-9dcfd8948a71';
+    var cb_entryId = 8659631, cb_entryCreatedDate = '2018-04-15 21:08', cb_postType = 1;
+    loadViewCount(cb_entryId);
+</script><a name="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<script>
+    var commentManager = new blogCommentManager();
+    commentManager.renderComments(0);
+</script>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a></div>
+    <div id="comment_form_container" style="visibility: visible;"><div class="login_tips">
+    注册用户登录后才能发表评论，请 
+    <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return login('commentform');">登录</a>
+     或 
+    <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return register();">注册</a>，
+    <a href="https://www.cnblogs.com/">访问</a> 网站首页。
+</div></div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+    <div id="ad_t2"><a href="https://www.cnblogs.com/cmt/p/13573071.html" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-华为开发者大会')">【推荐】华为开发者大会的邀请，园子的福利</a><br><a href="http://www.ucancode.com/index.htm" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-ucancode')">【推荐】超50万行VC++源码: 大型组态工控、电力仿真CAD与GIS源码库</a><br><a href="https://tianchi.aliyun.com/specials/promotion/supercoder" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-阿里云 在线编程')">【推荐】1200件T恤+6万奖金，阿里云编程大赛报名开启</a><br><a href="https://brands.cnblogs.com/agora" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-声网专区')">【推荐】未知数的距离，毫秒间的传递，声网与你实时互动</a><br><a href="https://brands.cnblogs.com/huawei" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-华为专区')">【推荐】了不起的开发者，挡不住的华为，园子里的品牌专区</a><br><a href="https://developer.aliyun.com/ask/272880?utm_content=g_1000104136" target="_blank" onclick="ga('send', 'event', 'Link', 'click', 'T2-阿里云开发者社区')">【推荐】前端精品集合之JavaScript实战100例</a><br></div>
+    <div id="opt_under_post"></div>
+    <div id="cnblogs_c1" class="c_ad_block">
+        <div id="div-gpt-ad-1592365906576-0" style="width: 300px; height: 250px;" data-google-query-id="CJyti_Stv-sCFZB5Kgodfw4D2g"><div id="google_ads_iframe_/1090369/C1_0__container__" style="border: 0pt none;"><iframe id="google_ads_iframe_/1090369/C1_0" title="3rd party ad content" name="google_ads_iframe_/1090369/C1_0" scrolling="no" marginwidth="0" marginheight="0" style="border: 0px none; vertical-align: bottom;" srcdoc="" data-google-container-id="1" data-load-complete="true" width="300" height="250" frameborder="0"></iframe></div></div>
+    </div>
+    <div id="under_post_news"><div class="recomm-block"><b>相关博文：</b><br>·  <a title="视觉SLAM算法框架解析(3) SVO" href="https://www.cnblogs.com/zonghaochen/p/8448620.html" target="_blank" onclick="clickRecomItmem(8448620)">视觉SLAM算法框架解析(3) SVO</a><br>·  <a title="直接法及SVO算法细节" href="https://www.cnblogs.com/wxt11/p/7097250.html" target="_blank" onclick="clickRecomItmem(7097250)">直接法及SVO算法细节</a><br>·  <a title="VINS-mono详细解读" href="https://www.cnblogs.com/ilekoaiq/p/8836970.html" target="_blank" onclick="clickRecomItmem(8836970)">VINS-mono详细解读</a><br>·  <a title="相机IMU融合四部曲（三）:MSF详细解读与使用" href="https://www.cnblogs.com/ilekoaiq/p/9311357.html" target="_blank" onclick="clickRecomItmem(9311357)">相机IMU融合四部曲（三）:MSF详细解读与使用</a><br>·  <a title="机器人视觉系统组成及定位算法" href="https://www.cnblogs.com/wangguchao/p/7381249.html" target="_blank" onclick="clickRecomItmem(7381249)">机器人视觉系统组成及定位算法</a><br>»  <a target="_blank" href="https://recomm.cnblogs.com/blogpost/8659631">更多推荐...</a></div></div>
+    <div id="cnblogs_c2" class="c_ad_block">
+        <div id="div-gpt-ad-1592366332455-0" style="width: 468px; height: 60px;" data-google-query-id="CJ2ti_Stv-sCFZB5Kgodfw4D2g"><div id="google_ads_iframe_/1090369/C2_0__container__" style="border: 0pt none;"><iframe id="google_ads_iframe_/1090369/C2_0" title="3rd party ad content" name="google_ads_iframe_/1090369/C2_0" scrolling="no" marginwidth="0" marginheight="0" style="border: 0px none; vertical-align: bottom;" srcdoc="" data-google-container-id="2" data-load-complete="true" width="468" height="60" frameborder="0"></iframe></div></div>
+    </div>
+    <div id="under_post_kb">
+<div class="itnews c_ad_block">
+    <b>最新 IT 新闻</b>:
+    <br>
+ ·          <a href="https://news.cnblogs.com/n/671583/" target="_blank">中芯国际上半年净利13.86亿元，N+1工艺已进入客户产品验证阶段</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/671590/" target="_blank">苹果或将自研搜索引擎 谷歌要从队友变对手？</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/671587/" target="_blank">世纪华通2020上半年扣非后净利15亿 同比增135%</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/671586/" target="_blank">京东方拟回购2.5亿股-3.5亿股，全部用于股权激励计划</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/671585/" target="_blank">中兴通讯上半年营收同比增5.8% 净利润同比增26.29%</a>
+        <br>
+    » <a href="https://news.cnblogs.com/" title="IT 新闻" target="_blank">更多新闻...</a>
+</div></div>
+    <div id="HistoryToday" class="c_ad_block"></div>
+    <script type="text/javascript">
+        fixPostBody();
+        deliverBigBanner();
+setTimeout(function() { incrementViewCount(cb_entryId); }, 50);        deliverT2();
+        deliverC1C2();
+        loadNewsAndKb();
+        loadBlogSignature();
+LoadPostCategoriesTags(cb_blogId, cb_entryId);        LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+        GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+        loadOptUnderPost();
+        GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+    </script>
+</div>
+
+</div>
+</div>
+<div id="leftmenu">
+
+
+<h3>导航</h3>
+<ul>
+    <li>
+        <a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+
+    </li>
+    <li>
+        
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/ilekoaiq/">
+首页</a>
+
+    </li>
+    <li>
+        
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+
+    </li>
+    <li>
+        
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B">
+联系</a>
+    </li>
+    <li>
+        
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/ilekoaiq/rss/">
+订阅</a>
+        
+<a id="blog_nav_rss_image" href="https://www.cnblogs.com/ilekoaiq/rss/">
+    <img src="SVO%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/xml.gif" alt="订阅">
+</a>
+    </li>
+    <li>
+        
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+
+    </li>
+</ul>
+
+
+<div id="blog-calendar" style="">
+
+<table id="blogCalendar" class="Cal" title="Calendar" cellspacing="0" cellpadding="0" border="0">
+    <tbody>
+        <tr>
+            <td colspan="7">
+                <table class="CalTitle" cellspacing="0" border="0">
+                    <tbody>
+                        <tr>
+                            <td class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar('2020/07/29'); return false;">&lt;</a>
+                            </td>
+                            <td align="center">2020年8月</td>
+                            <td class="CalNextPrev" align="right">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar('2020/09/29'); return false;">&gt;</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    <tr>
+        <th class="CalDayHeader" abbr="日" scope="col" align="center">日</th>
+        <th class="CalDayHeader" abbr="一" scope="col" align="center">一</th>
+        <th class="CalDayHeader" abbr="二" scope="col" align="center">二</th>
+        <th class="CalDayHeader" abbr="三" scope="col" align="center">三</th>
+        <th class="CalDayHeader" abbr="四" scope="col" align="center">四</th>
+        <th class="CalDayHeader" abbr="五" scope="col" align="center">五</th>
+        <th class="CalDayHeader" abbr="六" scope="col" align="center">六</th>
+    </tr>
+            <tr>
+                            <td class="CalOtherMonthDay" align="center">26</td>
+                            <td class="CalOtherMonthDay" align="center">27</td>
+                            <td class="CalOtherMonthDay" align="center">28</td>
+                            <td class="CalOtherMonthDay" align="center">29</td>
+                            <td class="CalOtherMonthDay" align="center">30</td>
+                            <td class="CalOtherMonthDay" align="center">31</td>
+                    <td class="CalWeekendDay" align="center">
+                        1
+                    </td>
+            </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            2
+                        </td>
+                            <td class="" align="center">
+                                3
+                            </td>
+                            <td class="" align="center">
+                                4
+                            </td>
+                            <td class="" align="center">
+                                5
+                            </td>
+                            <td class="" align="center">
+                                6
+                            </td>
+                            <td class="" align="center">
+                                7
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            8
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            9
+                        </td>
+                            <td class="" align="center">
+                                10
+                            </td>
+                            <td class="" align="center">
+                                11
+                            </td>
+                            <td class="" align="center">
+                                12
+                            </td>
+                            <td class="" align="center">
+                                13
+                            </td>
+                            <td class="" align="center">
+                                14
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            15
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            16
+                        </td>
+                            <td class="" align="center">
+                                17
+                            </td>
+                            <td class="" align="center">
+                                18
+                            </td>
+                            <td class="" align="center">
+                                19
+                            </td>
+                            <td class="" align="center">
+                                20
+                            </td>
+                            <td class="" align="center">
+                                21
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            22
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            23
+                        </td>
+                            <td class="" align="center">
+                                24
+                            </td>
+                            <td class="" align="center">
+                                25
+                            </td>
+                            <td class="" align="center">
+                                26
+                            </td>
+                            <td class="" align="center">
+                                27
+                            </td>
+                            <td class="" align="center">
+                                28
+                            </td>
+                        <td class="CalTodayDay" align="center">
+                            29
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            30
+                        </td>
+                            <td class="" align="center">
+                                31
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                1
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                2
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                3
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                4
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            5
+                        </td>
+                </tr>
+    </tbody>
+</table></div><script>loadBlogDefaultCalendar();</script>
+
+<div id="sidebar_news" class="newsItem"><meta name="vs_showGrid" content="False">
+<h3>公告</h3>
+
+<div id="blog-news">
+    领英：https://www.linkedin.com/in/yuanli-zheng-31063459/
+    <div id="profile_block">
+        昵称：
+        <a href="https://home.cnblogs.com/u/ilekoaiq/">
+            极品巧克力
+        </a>
+        <br>
+        园龄：
+        <a href="https://home.cnblogs.com/u/ilekoaiq/" title="入园时间：2014-12-02">
+            5年8个月
+        </a>
+        <br>
+        粉丝：
+        <a href="https://home.cnblogs.com/u/ilekoaiq/followers/">
+            79
+        </a>
+        <br>
+        关注：
+        <a href="https://home.cnblogs.com/u/ilekoaiq/followees/">
+            1
+        </a>
+        <div id="p_b_follow">
+<a href="javascript:void(0)" onclick="follow('6f40e42c-007a-e411-b908-9dcfd8948a71')">+加关注</a></div>
+        <script>getFollowStatus('6f40e42c-007a-e411-b908-9dcfd8948a71');</script>
+    </div>
+</div>
+
+</div>
+
+<div id="sidebar_ad"></div>
+<div id="blog-sidecolumn">
+<!-- 搜索 -->
+<div id="sidebar_search" class="sidebar-block">
+    <div id="sidebar_search" class="mySearch">
+        <h3 class="catListTitle">搜索</h3>
+        <div id="sidebar_search_box">
+            <div id="widget_my_zzk" class="div_my_zzk">
+                <input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk">
+            </div>
+            <div id="widget_my_google" class="div_my_zzk">
+                <input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 常用链接 -->
+<div id="sidebar_shortcut" class="sidebar-block">
+    
+<h3 class="catListTitle">
+常用链接
+</h3>
+<ul>
+    
+<li><a href="https://www.cnblogs.com/ilekoaiq/p/" title="我的博客的随笔列表">我的随笔</a></li>
+<li><a href="https://www.cnblogs.com/ilekoaiq/MyComments.html" title="我的发表过的评论列表">我的评论</a></li>
+<li><a href="https://www.cnblogs.com/ilekoaiq/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li>
+<li><a href="https://www.cnblogs.com/ilekoaiq/RecentComments.html" title="我的博客的评论列表">最新评论</a></li>
+<li><a href="https://www.cnblogs.com/ilekoaiq/tag/" title="我的博客的标签列表">我的标签</a></li>
+
+</ul>
+
+</div>
+
+<!-- 最新随笔 -->
+
+
+
+<!-- 我的标签 -->
+<div id="sidebar_toptags" class="sidebar-block">
+    
+<h3>我的标签</h3>
+<div id="MyTag">
+    <ul>
+        
+        <li>
+            <a href="https://www.cnblogs.com/ilekoaiq/tag/IMU%E8%9E%8D%E5%90%88/">IMU融合</a>(1)
+        </li>
+    
+
+    </ul>
+</div>
+
+</div>
+
+<!-- 积分与排名 -->
+
+
+<!-- 随笔分类、随笔档案、文章分类、新闻分类、相册、链接 -->
+<div id="sidebar_categories">
+    
+		<h3>
+随笔档案
+
+
+</h3>
+				<ul>
+			
+				<li>
+<a href="https://www.cnblogs.com/ilekoaiq/archive/2018/07.html" rel="" target="">
+    2018年7月(3)
+</a>
+
+</li>
+				<li>
+<a href="https://www.cnblogs.com/ilekoaiq/archive/2018/04.html" rel="" target="">
+    2018年4月(5)
+</a>
+
+</li>
+			
+				</ul>
+
+
+</div>
+
+<!-- 最新评论 -->
+<div id="sidebar_recentcomments" class="sidebar-block">
+    <div id="recent_comments_wrap" class="RecentComment">
+    <h3 class="catListTitle">最新评论</h3>
+    <div class="RecentCommentBlock">
+        <ul>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/ilekoaiq/p/8836970.html">1. Re:VINS-mono详细解读</a></li>
+                    <li class="recent_comment_body">博主你好！感谢你分享的VINS MONO理解。 想请教一个代码实现的问题。我看到不论是VINS MONO还是后面的VINS FUSION，在对窗口满帧解陀螺bias中，都会在求解完Bgs后，做一次重预...</li>
+                    <li class="recent_comment_author">--品茶赛马</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/ilekoaiq/p/9311357.html">2. Re:相机IMU融合四部曲（三）:MSF详细解读与使用</a></li>
+                    <li class="recent_comment_body">@Aesop 这个不需要.bag文件...</li>
+                    <li class="recent_comment_author">--sheroy</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/ilekoaiq/p/9311357.html">3. Re:相机IMU融合四部曲（三）:MSF详细解读与使用</a></li>
+                    <li class="recent_comment_body">@sheroy 谢谢！我在生成类似dataset.bag的数据时遇到了问题，我自己按照dataset.bag生成的可以播放的数据在运行的时候没办法放在MSF里正确运行，得不到结果，所以我想知道怎么才能...</li>
+                    <li class="recent_comment_author">--Aesop</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/ilekoaiq/p/9311357.html">4. Re:相机IMU融合四部曲（三）:MSF详细解读与使用</a></li>
+                    <li class="recent_comment_body">@Aesop 这有C++版本可以试试...</li>
+                    <li class="recent_comment_author">--sheroy</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/ilekoaiq/p/9311357.html">5. Re:相机IMU融合四部曲（三）:MSF详细解读与使用</a></li>
+                    <li class="recent_comment_body"><p>前辈，我最近正在用这个做毕设，请问您是怎么生成可用于msf的imu和vo的数据的rosbag的，我自己试着改成rosbag的格式，但是在stamp那里对不上。</p>
+</li>
+                    <li class="recent_comment_author">--Aesop</li>
+        </ul>
+    </div>
+</div>
+</div>
+
+
+
+<!-- 阅读排行榜 -->
+<div id="sidebar_topviewedposts" class="sidebar-block">
+    
+<div id="topview_posts_wrap">
+    <h3 class="catListTitle">阅读排行榜</h3>
+    <div id="TopViewPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8836970.html">
+                            1. VINS-mono详细解读(19749)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8659631.html">
+                            2. SVO详细解读(11676)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/9311357.html">
+                            3. 相机IMU融合四部曲（三）:MSF详细解读与使用(7126)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8849217.html">
+                            4. Madgwick算法详细解读(6496)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8710812.html">
+                            5. Google Cardboard的九轴融合算法——基于李群的扩展卡尔曼滤波(5374)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div>
+</div>
+
+<!-- 评论排行榜 -->
+<div id="sidebar_topcommentedposts" class="sidebar-block">
+    
+<div id="topfeedback_posts_wrap">
+    <h3 class="catListTitle">评论排行榜</h3>
+    <div id="TopFeedbackPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/9311357.html">
+                            1. 相机IMU融合四部曲（三）:MSF详细解读与使用(28)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8836970.html">
+                            2. VINS-mono详细解读(11)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8710812.html">
+                            3. Google Cardboard的九轴融合算法——基于李群的扩展卡尔曼滤波(5)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/9266036.html">
+                            4. 相机IMU融合四部曲（二）：误差状态四元数详细解读(1)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div>
+</div>
+
+<!-- 推荐排行榜 -->
+<div id="sidebar_topdiggedposts" class="sidebar-block">
+    
+<div id="topdigg_posts_wrap">
+    <div class="catListView">
+        <h3 class="catListTitle">推荐排行榜</h3>
+        <div id="TopDiggPostsBlock">
+            <ul style="word-break: break-all">
+                        <li>
+                            <a href="https://www.cnblogs.com/ilekoaiq/p/8836970.html">
+                                1. VINS-mono详细解读(5)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/ilekoaiq/p/9311357.html">
+                                2. 相机IMU融合四部曲（三）:MSF详细解读与使用(5)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/ilekoaiq/p/8710812.html">
+                                3. Google Cardboard的九轴融合算法——基于李群的扩展卡尔曼滤波(4)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/ilekoaiq/p/8228324.html">
+                                4. 深度滤波器详细解读(1)
+                            </a>
+                        </li>
+            </ul>
+        </div>
+    </div>
+</div>
+</div></div>
+                    <script>loadBlogSideColumn();</script>
+
+</div>
+</div>
+<div class="clear"></div>
+<div id="footer">
+<p id="footer">
+	Powered by: 
+	<br>
+	
+	<a href="https://www.cnblogs.com/" id="footer_site_link">博客园</a>
+	<br>
+	Copyright © 2020 极品巧克力
+<br><span id="poweredby">Powered by .NET Core on Kubernetes</span>
+
+</p>
+
+
+</div>
+</div>
+
+
+    
+
+
+</body></html>

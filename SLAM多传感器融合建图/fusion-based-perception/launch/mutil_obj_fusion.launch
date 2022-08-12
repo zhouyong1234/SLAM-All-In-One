@@ -1,0 +1,8 @@
+<launch>
+    <node name="kit_perception" pkg="kit_perception" type="sensor_fusion_node" output="screen"
+        args="$(find kit_perception)/config/transform.yaml 
+		      $(find kit_perception)/test_data/mutil_obj/localization  
+		      $(find kit_perception)/test_data/mutil_obj/camera 
+              $(find kit_perception)/test_data/mutil_obj/lidar"
+    />
+</launch>

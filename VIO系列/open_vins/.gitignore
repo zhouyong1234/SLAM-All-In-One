@@ -1,0 +1,8 @@
+cmake-build-*
+build
+Build
+*.*~
+.idea
+doxgen_generated
+*.swp
+*.swo

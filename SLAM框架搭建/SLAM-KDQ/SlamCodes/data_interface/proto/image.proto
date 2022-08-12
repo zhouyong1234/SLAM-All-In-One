@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package vision;
+
+message BottomImage {
+  bytes image_buffer = 1; //图像数据缓存
+  double timestamp = 2; //图像时间戳，单位：秒
+  uint32 width = 3; //图像宽度
+  uint32 height = 4; //图像高度
+  float exposure_time = 5; //图像曝光时间，单位：秒
+}

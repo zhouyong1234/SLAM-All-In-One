@@ -1,0 +1,13 @@
+<launch>
+    <!-- <arg name="gps_path" default="/home/touchair/gps_ws/src/rosbag_resize/gpsData172744.txt" /> -->
+    <arg name="imu_path" default = "/home/touchair/gps_ws/src/rosbag_resize/xsens_imu.csv" />
+
+    <node pkg="rosbag_resize" type="rec_publish_imu_node" name="imu_publish" output="screen">
+        <param name="imu_file" type="string" value="$(arg imu_path)" />
+    </node>
+
+    <!-- <node pkg="rosbag_resize" type="rec_publish_gps_node" name="gps_publish" output="screen">
+        <param name="gps_file" type="string" value="$(arg gps_path)" />
+    </node> -->
+
+</launch>

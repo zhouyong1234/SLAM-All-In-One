@@ -1,0 +1,33 @@
+<launch>
+
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find feature_tracker)/../config/kaist.rviz" required="true" />
+
+    <arg name="config_path" default = "$(find feature_tracker)/../config/kaist.yaml" />
+	<arg name="vins_path" default = "$(find feature_tracker)/../config/../" />
+
+    <node name="feature_tracker" pkg="feature_tracker" type="feature_tracker" output="log">
+        <param name="config_file" type="string" value="$(arg config_path)" />
+        <param name="vins_folder" type="string" value="$(arg vins_path)" />
+    </node>
+
+    <node name="msckf_estimator" pkg="msckf_estimator" type="msckf_estimator" output="screen">
+		<param name="config_file" type="string" value="$(arg config_path)" />
+		<param name="vins_folder" type="string" value="$(arg vins_path)" />
+    </node>
+
+    <node name="encoder_publisher" pkg="read_kaist_dataset" type="encoder_publisher" output="screen">
+    </node>
+
+    <node name="imu_publisher" pkg="read_kaist_dataset" type="imu_publisher" output="screen">
+    </node>
+
+    <node name="img_publisher" pkg="read_kaist_dataset" type="img_publisher" output="screen">
+    </node>
+
+    <node name="gps_publisher" pkg="read_kaist_dataset" type="gps_publisher" output="screen">
+    </node>
+
+    <node name="vrs_gps_publisher" pkg="read_kaist_dataset" type="vrs_gps_publisher" output="screen">
+    </node>
+
+</launch>

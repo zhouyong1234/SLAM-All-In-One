@@ -1,0 +1,13 @@
+<launch>
+  <include file="$(find laser_scan_matcher)/demo/demo.launch">
+    <arg name="use_rviz" value="false" />  <!-- RViz/GUI is not needed for the tests -->
+  </include>
+  
+  <!-- Check if MoveGroup is running -->
+  <param name="test_demolaunch/topic" value="/pose2D" />
+  <param name="test_demolaunch/hz" value="10.0" />
+  <param name="test_demolaunch/hzerror" value="1.0" />
+  <param name="test_demolaunch/test_duration" value="15.0" />
+  <param name="test_demolaunch/wait_time" value="15.0" />
+  <test pkg="rostest" type="hztest" test-name="test_demolaunch" name="test_demolaunch" time-limit="60"/>
+</launch>

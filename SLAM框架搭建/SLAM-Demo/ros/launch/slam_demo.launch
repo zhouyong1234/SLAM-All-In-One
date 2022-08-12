@@ -1,0 +1,6 @@
+<launch>
+    <!--     <node pkg="rviz"  type="rviz"  name="rviz"  args="-d $(find lidar_localization)/rviz/mapping.rviz"></node> -->
+    <arg name="file_name" default="/home/chen/catkin_ws/src/SLAM-Demo/config/KITTI.yaml"/>
+    <node pkg="slam_demo"  type="ros_node"  name="ros_node"  args="$(arg file_name)" output="screen"/>
+
+</launch>

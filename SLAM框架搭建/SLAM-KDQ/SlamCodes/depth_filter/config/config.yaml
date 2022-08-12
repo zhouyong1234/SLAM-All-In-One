@@ -1,0 +1,36 @@
+%YAML:1.0
+---
+imuFreq: 100
+imageFreq: 20
+simStart: 0
+simEnd: 50
+gyr_noise_sigma: 0.001
+acc_noise_sigma: 0.01
+gyr_bias_sigma: 0.0001
+acc_bias_sigma: 0.001
+pixel_noise: 1
+add_pixel_noise: 10
+simulator_landmark_size: 10
+simulator_landmark_width: 10
+simulator_position_noise_xy : 2
+simulator_position_noise_z : 5
+camera_yaml: "/home/kdq/Workspace/SLAM/SLAM-KDQ/SlamCodes/depth_filter/config/cam0_pinhole.yaml"
+
+Tbc: !!opencv-matrix
+  rows: 4
+  cols: 4
+  dt: d
+  data: [-1.0,  0.,  0., 0.,
+          0.0, 1.0,  0., 0,
+           0.,  0.,-1.0, 0,
+           0.,  0.,  0., 1.0]
+
+
+SimModel: !!opencv-matrix
+  rows: 3
+  cols: 6
+  dt: d
+  data: [1.0, 6.0, 0.0, 0.0, 6, 0.0,
+         1.0, 6.0, 0.0, 0.0, 6., 0.0,
+         1.0, 0.0, 100.0,0.0,0.075,0.0]
+#       skew,phase,bias,skew,phase,bias

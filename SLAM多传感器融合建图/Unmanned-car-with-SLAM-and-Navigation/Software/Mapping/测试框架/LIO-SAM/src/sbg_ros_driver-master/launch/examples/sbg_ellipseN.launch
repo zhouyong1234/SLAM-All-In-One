@@ -1,0 +1,6 @@
+<launch>
+  <node name="sbg_ellipseN" pkg="sbg_driver" type="sbg_device" output="screen">
+  	<rosparam command="load" file="$(find sbg_driver)/config/example/ellipse_N_default.yaml" />
+	<remap from="/imu/data" to="imu_raw" />
+  </node>
+</launch>

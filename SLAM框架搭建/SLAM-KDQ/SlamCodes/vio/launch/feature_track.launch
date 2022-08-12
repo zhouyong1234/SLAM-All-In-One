@@ -1,0 +1,10 @@
+<launch>
+  
+  <arg name="image_topic" default="/camera/image_raw"  />
+  <arg name="cfg_file" default="$(find vo_ros)/config/default.yaml" />
+  <node name="feature_track" pkg="vo_ros" type="test_feature_track" output="screen" >
+    <param name="topic_image" type="string" value="$(arg image_topic)" />
+    <param name="config_file" type="string" value="$(arg cfg_file)" />
+  </node>
+
+</launch>

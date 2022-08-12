@@ -1,0 +1,6 @@
+﻿<launch>
+  <!--起雷达驱动-->
+  <include file="$(find livox_ros_driver)/launch/livox_lidar.launch" />
+  <!--起livox_mapping包-->
+  <include file="$(find livox_mapping)/launch/mapping_mid.launch" />
+</launch>

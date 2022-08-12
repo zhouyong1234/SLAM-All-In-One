@@ -1,0 +1,5 @@
+<launch>
+<node pkg="rviz"  type="rviz"  name="rviz"  args="-d $(find global_localization)/rviz/matching.rviz"></node>
+<node pkg="global_localization"  type="data_pretreat_node"  name="data_pretreat_node"  output="screen"></node>
+<node pkg="global_localization"  type="global_localization_node"  name="global_localization_node"  output="screen"></node>
+</launch>

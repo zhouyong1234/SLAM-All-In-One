@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/touchair/gnss_ws/src/开源SLAM框架注释/FAST_LIO2_Noted'
+make: Leaving directory '/home/touchair/gnss_ws/src/开源SLAM框架注释/FAST_LIO2_Noted'
+ 
+make: *** No targets specified and no makefile found.  Stop.
+

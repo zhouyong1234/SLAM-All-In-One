@@ -1,0 +1,18 @@
+<package>
+  <!-- Package Metadata -->
+  <name>ORB_SLAM3_LIB</name>
+  <author>Raul Mur-Artal</author>
+  <maintainer email="raulmur@unizar.es">Raul Mur-Artal</maintainer>
+  <description>
+    ORB SLAM2 functionality as a catkin lib package.
+  </description>
+  <version>0.0.0</version>
+  <license>GPLv3</license>
+
+  <!-- Required by Catkin -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Package Dependencies -->
+  <build_depend>roscpp</build_depend>
+  <run_depend>roscpp</run_depend>
+</package>

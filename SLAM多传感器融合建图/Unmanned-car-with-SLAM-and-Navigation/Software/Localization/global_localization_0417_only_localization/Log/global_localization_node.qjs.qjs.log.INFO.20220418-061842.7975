@@ -1,0 +1,33 @@
+Log file created at: 2022/04/18 06:18:42
+Running on machine: qjs
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0418 06:18:42.345940  7975 matching.cpp:53] 
+-----------------Init Localization-------------------
+I0418 06:18:42.350080  7975 scan_context_manager.cpp:50] Scan Context params:
+	max. radius: 80
+	max. theta: 360
+	num. rings: 20
+	num. sectors: 60
+	re-indexing interval: 1
+	min. key frame sequence distance: 100
+	nearest-neighbor candidates to check: 5
+	fast alignment search ratio: 0.1
+	loop-closure scan context distance thresh: 0.15
+
+I0418 06:18:42.350133  7975 scan_context_manager.cpp:238] 
+[Scan Context]: Load Scan Context Index.
+I0418 06:18:42.400090  7975 scan_context_manager.cpp:250] 	Num. Scan Contexts: 1907
+I0418 06:18:42.402520  7975 scan_context_manager.cpp:261] 	Num. Ring Keys: 1907
+I0418 06:18:42.403962  7975 scan_context_manager.cpp:272] 	Num. Key Frames: 1907
+I0418 06:18:42.405375  7975 scan_context_manager.cpp:283] 	Index Size: 1907
+I0418 06:18:42.598311  7975 matching.cpp:77] Load global map, size:1649309
+I0418 06:18:42.757551  7975 matching.cpp:81] Filtered global map, size:1649309
+I0418 06:18:42.877818  7975 matching.cpp:99] New local map:-150,150,-150,150,-150,150
+
+I0418 06:18:53.361807  7975 scan_context_manager.cpp:719] 
+[Scan Context] Loop-Closure Detected 1906<-->374
+	Distance 0.0944237
+	Heading Change 0 deg.
+
+I0418 06:18:53.462234  7975 matching.cpp:99] New local map:-136.652,163.348,239.266,539.266,-149.602,150.398
+

@@ -1,0 +1,66 @@
+%YAML:1.0
+
+Estimator.KeyFrameMatchedPoints: 20
+Estimator.KeyFrameParallexThreshold: 5
+Estimator.ReprojectPixelErr: 3
+Estimator.BundleAdjustment: 1
+Estimator.EnableFeaturePrediction: 0
+Estimator.EnableVOAlignedToWorld: 0
+
+OptiTrack.TrackBack: 1
+OptiTrack.TrackBackPixelErr: 1.0
+OptiTrack.MaxPoints: 120
+OptiTrack.MinDist: 15
+OptiTrack.QualityLevel: 0.03
+OptiTrack.PyramidLevel: 2
+OptiTrack.Iterations: 10
+OptiTrack.EPS: 0.01
+OptiTrack.PredictEnable: 0
+OptiTrack.ShowTrackFrames: 5
+OptiTrack.ShowDebugInfos: 0
+
+Init.MinDisparity: 20
+Init.MinMatchedFeatNum: 40
+Init.ReprojectErr: 1
+Init.HomographyTransformErr: 3
+
+PnpSolver.ReprojectErr: 6.0
+PnpSolver.SuccessRatio: 0.65
+PnpSolver.ShowDebugInfo: 0
+
+Sim.Length.x: 10.0
+Sim.Length.y: 10.0
+Sim.Length.z: 0.01
+Sim.Origin.x: 0.0
+Sim.Origin.y: 0.0
+Sim.Origin.z: 1.0
+Sim.FeatureSize: 2000
+
+Camera.Intrinisic: !!opencv-matrix
+  rows: 3
+  cols: 3
+  dt: d
+  data: [171.9127719, 0.0, 166.9005009,
+           0.0, 172.2210894, 117.5154348, 
+           0.0,  0.0,   1.0]
+Camera.Distortion: !!opencv-matrix
+  rows: 1
+  cols: 4
+  dt: d
+  data: [0.2742372,-0.3608315,0.1168417,0.0000000]
+Camera.IsFisheye : 1
+Camera.Width: 320
+Camera.Height: 240
+
+Rbc: !!opencv-matrix
+  rows: 3
+  cols: 3
+  dt: d
+  data: [1.0, 0.0, 0.0,
+         0.0, 1.0, 0.0,
+         0.0, 0.0, 1.0]
+tbc: !!opencv-matrix
+  rows: 3
+  cols: 1
+  dt: d
+  data: [0.02, 0.04, 0.005]

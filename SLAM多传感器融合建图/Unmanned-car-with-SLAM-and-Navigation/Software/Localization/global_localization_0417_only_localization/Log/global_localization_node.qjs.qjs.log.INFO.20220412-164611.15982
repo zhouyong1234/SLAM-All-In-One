@@ -1,0 +1,5 @@
+Log file created at: 2022/04/12 16:46:11
+Running on machine: qjs
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0412 16:46:11.264561 15982 matching.cpp:29] 
+-----------------Init Localization-------------------

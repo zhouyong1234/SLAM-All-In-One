@@ -1,0 +1,119 @@
+filter_method: ESKF #EKF， ESKF, ESKFQK
+
+data_path: /data/raw_data1 #数据使用  /data/raw_data; /data/raw_data1: raw_data是使用mid-accuracy IMU生成， raw_data1是使用low-accuracy IMU生成
+
+earth:
+  rotation_speed: 7.272205216e-05
+  gravity: 9.79484197226504
+  latitude: 32
+  longtitude: 120
+
+# EKF的对应的两组数据的参数
+EKF:
+  covariance: # 数据raw_data
+    prior:
+      posi: 1 # 1.0e-4
+      vel: 1 # 1.0e-4
+      ori: 1 # 1.0e-6
+      gyro_delta: 1.0e-3  # 1.0e-6
+      accel_delta: 1.0e-3 # 1.0e-6
+    process: # Q 相信模型的程度
+      gyro_delta: 1
+      accel_delta: 1
+    IMU_noise: # 器件噪声  W矩阵
+      gyro_delta: 0.01
+      accel_delta: 0.01
+    measurement:
+      posi: 10
+  
+  covariance1: # 数据raw_data1
+    prior:
+      posi: 1 # 1.0e-4
+      vel: 1 # 1.0e-4
+      ori: 1 # 1.0e-6
+      gyro_delta: 1.0e-3  # 1.0e-6
+      accel_delta: 1.0e-3 # 1.0e-6
+    process: # Q
+      gyro_delta: 20
+      accel_delta: 20
+    IMU_noise: # 器件噪声  W矩阵
+      gyro_delta: 0.01
+      accel_delta: 0.01
+    measurement:
+      posi: 35
+
+# ESKF的对应的两组数据的参数
+ESKF:
+  covariance:
+    prior:
+      posi: 1.0e-4
+      vel: 1.0e-4
+      ori: 1.0e-6
+      gyro_delta: 1.0e-6
+      accel_delta: 1.0e-6
+    process: # Q
+      gyro_delta: 1.0e-1
+      accel_delta: 1.0e-1
+    IMU_noise: # 器件噪声  W矩阵
+      gyro_delta: 0.001
+      accel_delta: 0.001    
+    measurement:
+      posi: 20
+
+  ### 没调出来
+  covariance1:
+    prior:
+      posi: 1.0e-1
+      vel: 1.0e-1
+      ori: 1.0
+      gyro_delta: 1.0
+      accel_delta: 1.0
+    process: # Q
+      gyro_delta: 10
+      accel_delta: 10
+    IMU_noise: # 器件噪声  W矩阵
+      gyro_delta: 0.01
+      accel_delta: 0.01
+    measurement:
+      posi: 25
+
+
+# Quaternion kinematics for error state kalman filter的算法实现
+ESKFQK:
+  covariance:
+    prior:
+      posi: 1.0e-1
+      vel: 1.0e-1
+      ori: 1.0e-1
+      accel_delta: 1.0e-1
+      gyro_delta: 1.0e-1
+      g_delta: 1.0e-1
+    process: # Q 我的模型应该是比较好的
+      vel_delta: 1.0e-2
+      ori_delta: 1.0e-2
+      accel_delta: 1.0e-2
+      gyro_delta: 1.0e-2
+    IMU_noise: # 器件噪声  W矩阵
+      gyro_delta: 0.01
+      accel_delta: 0.01
+    measurement:
+      posi: 30
+
+  covariance1:
+    prior:
+      posi: 1.0e-1
+      vel: 1.0e-1
+      ori: 1.0e-1
+      accel_delta: 1.0e-1
+      gyro_delta: 1.0e-1
+      g_delta: 1.0e-1
+    process: # Q
+      vel_delta: 1.0e-3
+      ori_delta: 1.0e-1
+      accel_delta: 1.0e-2
+      gyro_delta: 1.0e-3
+    IMU_noise: # 器件噪声  W矩阵
+      gyro_delta: 0.1
+      accel_delta: 0.1
+    measurement:
+      posi: 35

@@ -1,0 +1,53 @@
+%YAML:1.0
+
+# image intput
+## KITTI/TUM/OTHER
+Image.Dataset   :  "KITTI"
+Image.Path      :  "/home/touchair/下载/dataset/data_odometry_color/00"
+# Image.Path      :  "/home/chen/桌面/SLAM/SLAM-Demo/data/"
+Image.Mode      :  "Stereo"
+
+Image.ORB_Features : 1
+Image.SIFT_Features: 0
+Image.SURF_Features: 0
+
+Image.Resize: 0
+
+Pose.Path : "/home/touchair/gnss_ws/src/SLAM-Demo/result/res.txt"
+
+
+# ======================================================
+
+# Camera calibration and distortion parameters (OpenCV)
+Camera.fx: 7.188560000000e+02
+Camera.fy: 7.188560000000e+02
+Camera.cx: 6.071928000000e+02
+Camera.cy: 1.852157000000e+02
+
+Camera.k1: 0.0
+Camera.k2: 0.0
+Camera.p1: 0.0
+Camera.p2: 0.0
+
+Camera.width: 1241
+Camera.height: 376
+
+# Camera frames per second
+Camera.fps: 10.0
+
+# Close/Far threshold. Baseline times.
+ThDepth: 40
+
+# ======================================================
+
+# stereo baseline times fx
+Stereo.bf: 379.8145
+# the Th of depth is 30m
+Stereo.th: 30000
+# 0: SGBM
+Stereo.MatchingMethod: 0
+
+# ======================================================
+Opts.maxRansacIter : 200
+Opts.ErrorTH : 2
+

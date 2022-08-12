@@ -1,0 +1,3 @@
+/home/touchair/gnss_ws/src/TinyGrapeKit/third_party/GeographicLib/build/CMakeFiles/rebuild_cache.dir
+/home/touchair/gnss_ws/src/TinyGrapeKit/third_party/GeographicLib/build/CMakeFiles/libGeographiccc.dir
+/home/touchair/gnss_ws/src/TinyGrapeKit/third_party/GeographicLib/build/CMakeFiles/edit_cache.dir

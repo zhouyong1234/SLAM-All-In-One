@@ -1,0 +1,22 @@
+<launch>
+  <include file="$(find laser_scan_matcher)/demo/demo.launch">
+    <arg name="use_rviz" value="false" />  <!-- RViz/GUI is not needed for the tests -->
+    <arg name="publish_covariance" value="true" />
+  </include>
+
+  <!-- Check if PoseWithCovariance is publishing -->
+  <param name="test_cov/topic" value="/pose_with_covariance" />
+  <param name="test_cov/hz" value="10.0" />
+  <param name="test_cov/hzerror" value="1.0" />
+  <param name="test_cov/test_duration" value="15.0" />
+  <param name="test_cov/wait_time" value="15.0" />
+  <test pkg="rostest" type="hztest" test-name="test_cov" name="test_cov" time-limit="60"/>
+
+  <!-- Check if PoseWithCovarianceStamped is publishing -->
+  <param name="test_covstamped/topic" value="/pose_with_covariance_stamped" />
+  <param name="test_covstamped/hz" value="10.0" />
+  <param name="test_covstamped/hzerror" value="1.0" />
+  <param name="test_covstamped/test_duration" value="15.0" />
+  <param name="test_covstamped/wait_time" value="15.0" />
+  <test pkg="rostest" type="hztest" test-name="test_covstamped" name="test_covstamped" time-limit="60"/>
+</launch>

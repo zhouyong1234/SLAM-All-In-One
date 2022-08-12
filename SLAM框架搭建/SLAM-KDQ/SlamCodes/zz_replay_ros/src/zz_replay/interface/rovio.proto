@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package rovio;
+
+message Vec3f {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message Mat3f {
+  float xx = 1;
+  float xy = 2;
+  float xz = 3;
+  float yx = 4;
+  float yy = 5;
+  float yz = 6;
+  float zx = 7;
+  float zy = 8;
+  float zz = 9;
+}
+
+message Quatf {
+  float w = 1;
+  float x = 2;
+  float y = 3;
+  float z = 4;
+}
+
+message InputInfo {
+  double t = 1;
+  Vec3f gyr = 2;
+  Vec3f acc = 3;
+  Quatf quat = 4;
+  float proxi = 5;
+}
+
+message InputInfoPack {
+  repeated InputInfo info = 1;
+}
+
+enum RovioStatus {
+  GOOD = 0;
+  BAD = 1;
+}
+
+message OutputInfo {
+  RovioStatus status = 1;
+  double timestamp = 2;
+  Vec3f position   = 3;
+  Vec3f velocity   = 4;
+  Quatf quaternion = 5;
+  Vec3f gyr_bias = 6;
+  Vec3f acc_bias = 7;
+  Vec3f pos_cov = 8;
+  Mat3f vel_cov = 9;
+  Vec3f att_cov = 10;
+  float depth = 11;
+}

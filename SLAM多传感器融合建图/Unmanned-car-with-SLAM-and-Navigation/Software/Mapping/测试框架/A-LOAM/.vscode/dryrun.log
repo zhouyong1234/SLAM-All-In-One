@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/touchair/gnss_ws/src/SLAM多传感器融合建图/Unmanned-car-with-SLAM-and-Navigation/Software/Mapping/测试框架/A-LOAM'
+make: Leaving directory '/home/touchair/gnss_ws/src/SLAM多传感器融合建图/Unmanned-car-with-SLAM-and-Navigation/Software/Mapping/测试框架/A-LOAM'
+ 
+make: *** No targets specified and no makefile found.  Stop.
+

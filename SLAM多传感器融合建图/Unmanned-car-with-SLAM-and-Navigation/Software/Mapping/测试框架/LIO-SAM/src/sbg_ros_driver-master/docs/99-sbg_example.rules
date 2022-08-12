@@ -1,0 +1,1 @@
+SUBSYSTEMS=="usb", ATTRS{product}=="USB-RS232 Cable", ATTRS{serial}=="FTUCFXCN", SYMLINK+="sbg", GROUP="dialout", MODE="0660"

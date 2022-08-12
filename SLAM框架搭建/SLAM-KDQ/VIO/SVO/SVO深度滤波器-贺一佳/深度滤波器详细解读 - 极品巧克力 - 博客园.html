@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="zh-cn"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin-when-crossorigin">
+    <meta name="description" content="深度滤波器详细解读 极品巧克力 前言 空间定位是VR\AR中的一项关键技术，计算机创建出来的虚拟图像必须要依赖空间定位技术才能与现实（Reality）联结在一起，所以它直接决定了用户体验的好坏。高精度">
+    <meta property="og:description" content="深度滤波器详细解读 极品巧克力 前言 空间定位是VR\AR中的一项关键技术，计算机创建出来的虚拟图像必须要依赖空间定位技术才能与现实（Reality）联结在一起，所以它直接决定了用户体验的好坏。高精度">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>深度滤波器详细解读 - 极品巧克力 - 博客园</title>
+    <link id="favicon" rel="shortcut icon" href="https://common.cnblogs.com/favicon.svg" type="image/svg+xml">
+    
+    <link rel="stylesheet" href="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/blog-common.css">
+    <link id="MainCss" rel="stylesheet" href="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/bundle-anothereon001.css">
+    <link type="text/css" rel="stylesheet" href="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/cnblogs.css">
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/bundle-anothereon001-mobile.css">
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/ilekoaiq/rss">
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/ilekoaiq/rsd.xml">
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/ilekoaiq/wlwmanifest.xml">
+    <script>
+        var currentBlogId = 405135;
+        var currentBlogApp = 'ilekoaiq';
+        var cb_enable_mathjax = false;
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'AnotherEon001';
+        var visitorUserId = '';
+        var hasCustomScript = false;
+        try {
+            if (hasCustomScript && document.referrer && document.referrer.indexOf('baidu.com') >= 0) {
+                Object.defineProperty(document, 'referrer', { value: '' });
+                Object.defineProperty(Document.prototype, 'referrer', { get: function(){ return ''; } });
+            }
+        } catch(error) { }
+    </script>
+        <script>
+            var currentPostDateAdded = '2018-04-15 09:04';
+        </script>
+    <script src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/jquery-2.js"></script>
+    <script src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/blog-common.js"></script><style type="text/css">.medium-zoom-overlay{position:fixed;top:0;right:0;bottom:0;left:0;opacity:0;transition:opacity .3s;will-change:opacity}.medium-zoom--opened .medium-zoom-overlay{cursor:pointer;cursor:zoom-out;opacity:1}.medium-zoom-image{cursor:pointer;cursor:zoom-in;transition:transform .3s cubic-bezier(.2,0,.2,1)!important}.medium-zoom-image--hidden{visibility:hidden}.medium-zoom-image--opened{position:relative;cursor:pointer;cursor:zoom-out;will-change:transform}</style>
+    
+    
+    
+    <script type="text/javascript">
+        window.codeHighlightEngine = 1
+        window.enableCodeLineNumber = false
+    </script>
+</head>
+<body class="skin-anothereon001 has-navbar has-bannerbar">
+    <a name="top"></a>
+        <img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/35695-20211008160613875-1434480564.jpg" style="display:none" onload="impressC0()">
+        <a target="_blank" href="https://c.gridsumdissector.com/r/?gid=gad_545_fieh18b6&amp;ck=46&amp;adk=567&amp;autorefresh=__AUTOREFRESH__" onclick="clickBanner(494);ga('send', 'event', 'banner', 'click', 'C0-pangle')">
+            <div class="bannerbar aliyun forpc" style="background-size: contain; background-image: url(https://img2020.cnblogs.com/blog/35695/202110/35695-20211008160613875-1434480564.jpg)">
+            </div>
+        </a>     
+    <div id="top_nav" class="navbar forpc">
+        <nav id="nav_main" class="navbar-main">
+            <ul id="nav_left" class="navbar-list navbar-left">
+                <li class="navbar-branding"><a href="https://www.cnblogs.com/" title="开发者的网上家园"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/logo.svg" alt="博客园Logo"></a></li>
+                <li><a href="https://www.cnblogs.com/" onclick="ga('send', 'event', 'Link', 'click', 'skin-navbar-sitehome')">首页</a></li>
+                <li><a href="https://news.cnblogs.com/" onclick="ga('send', 'event', 'Link', 'click', 'skin-navbar-news')">新闻</a></li>
+                <li><a href="https://q.cnblogs.com/" onclick="ga('send', 'event', 'Link', 'click', 'skin-navbar-q')">博问</a></li>
+                <li><a id="nav_brandzone" href="https://brands.cnblogs.com/" onclick="ga('send', 'event', 'Link', 'click', 'skin-navbar-brands')">专区</a></li>
+                <li><a href="https://ing.cnblogs.com/" onclick="ga('send', 'event', 'Link', 'click', 'skin-navbar-ing')">闪存</a></li>
+                <li><a href="https://edu.cnblogs.com/" onclick="ga('send', 'event', 'Link', 'click', 'skin-navbar-edu')">班级</a></li>
+            </ul>
+            <ul id="nav_right" class="navbar-list navbar-right">
+                <li>
+                    <form id="zzk_search" class="navbar-search" action="https://zzk.cnblogs.com/s" method="get">
+                        <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="text" tabindex="3">
+                        <button type="submit" id="zzk_search_button">
+                            <img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/search.svg" alt="搜索">
+                        </button>
+                    </form>
+                </li>
+                <li id="navbar_login_status" class="navbar-list">
+                    <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔" style="display: none;">
+                        <img id="new_post_icon" class="navbar-icon" src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/newpost.svg" alt="写随笔">
+                    </a>
+                    <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客" style="display: none;">
+                        <img id="myblog_icon" class="navbar-icon" src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/myblog.svg" alt="我的博客">
+                    </a>
+                    <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息" style="display: none;">
+                        <img id="msg_icon" class="navbar-icon" src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/message.svg" alt="短消息">
+                        <span id="msg_count" style="display: none"></span>
+                    </a>
+                    <div id="user_info" class="navbar-user-info dropdown" style="display: none;">
+                        <a class="dropdown-button" href="https://home.cnblogs.com/">
+                            <img id="user_icon" class="navbar-avatar" src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/avatar-default.svg" alt="用户头像">
+                        </a>
+                        <div class="dropdown-menu">
+                            <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                            <a href="https://home.cnblogs.com/">我的园子</a>
+                            <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                            <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/lite-mode-check.svg" class="hide"><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                            <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                        </div>
+                    </div>
+                    <a class="navbar-anonymous" href="https://account.cnblogs.com/signup/" style="display: inline;">注册</a>
+                    <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()" style="display: inline;">登录</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    
+    <div id="wrapper">
+<div id="header">
+
+<div id="top">
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/ilekoaiq/">极品巧克力</a>
+</h1>
+<div id="subtitle">SLAM</div>
+</div>
+<div id="sub"><div class="BlogStats">随笔 - 8, 文章 - 0, 评论 - 56, 阅读 - 
+<span title="总阅读数: 92126">
+92126</span></div>
+
+</div>
+
+
+
+
+</div>
+<div id="main_container">
+<div id="main_content">
+<div id="content">
+	<div id="post_detail">
+    <div class="post">
+        <h2>
+            
+<a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/ilekoaiq/p/8228324.html">
+    <span>深度滤波器详细解读</span>
+    
+
+
+
+</a>
+
+        </h2>
+        <div class="postbody">
+            <div id="cnblogs_post_body" class="blogpost-body blogpost-body-html">
+<p style="text-align: center"><span style="font-size: 22pt"><strong>深度滤波器详细解读</strong></span></p>
+<p style="text-align: center"><span style="font-size: 14pt"><strong>极品巧克力</strong></span></p>
+<h2>前言</h2>
+<p><span style="font-size: 12pt">空间定位是VR\AR中的一项关键技术，计算机创建出来的虚拟图像必须要依赖空间定
+位技术才能与现实（Reality）联结在一起，所以它直接决定了用户体验的好坏。高精度的空间定位可以让VR用户体验到完全的沉浸感，AR中的虚拟物体
+更加逼真；而如果空间定位的精度比较差的话，则VR用户会头晕想吐，AR中的虚拟物体会漂移。 </span></p>
+<p><span style="font-size: 12pt">空间定位技术又可以分为两类，outside-in和inside-out。outside-in方案，需要在环境中架设定位基站，对用户进行定位跟踪，比如现在市面上的HTC Vive和Oculus Rift。 </span></p>
+<p>&nbsp; &nbsp;<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163735628-968486731.png" alt="" class="medium-zoom-image">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163735924-456589834.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">而inside-out方案，不需要在环境中架设基站，它只通过自身携带的传感器来
+进行定位，比如微软的HoloLens、WindowsMR头盔系列、HTC Vive 
+Focus、苹果的ARKit、谷歌的ARCore和Project Tango，还有预计将在2018年发售的Oculus Santa 
+Cruz、Magic Leap One。（当然，还有室内机器人、无人机、无人车）。 </span></p>
+<p>&nbsp;<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163736253-326509704.png" alt="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163736487-1103420898.png" alt="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<span style="font-size: 12pt"> <img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163736768-1915957504.png" alt=""></span></p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163736971-1555957145.png" alt="">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163737253-411181793.png" alt=""></p>
+<p><span style="font-size: 12pt">outside-in方案要架设定位基站，并且对用户的活动范围有限制，相当于"PC互联网时代"，只适合PCVR。 </span></p>
+<p><span style="font-size: 12pt">而insiede-out方案更加轻便自然，就像人用眼睛观察，就能知道自己在环境
+中的位置一样。用户只需要戴着头盔，就能随意走动，没有运动范围限制，相当于"移动互联网时代"。从目前的发展趋势来看，inside-out方案正在逐
+渐走向成熟，被应用在越来越多的VR一体机和AR眼镜上。</span></p>
+<p><span style="font-size: 12pt">而我接下来要探讨的是，如何让建立的地图点更加准确。因为无论哪种算法，准确跟踪定位的前提都是，要有准确的地图点。但是，由于传感器噪声和环境噪声的存在，总是会不可避免地创建出一些误差大的甚至假的地图点，这些错误的地图点会对跟踪定位的准确性造成很大的影响。 </span></p>
+<p><span style="font-size: 12pt">所以，我接下来就介绍一种可以让地图点更加准确的方法——深度滤波，它可以通过多次
+观测，计算出一个地图点是假的地图点还是真实地图点的概率，并且计算出其作为真实地图点的最有可能的位置。它最初是用在三维重建中的
+(http://george-vogiatzis.org/)，后来被用在SVO（Semi-Direct Monocular Visual 
+Odometry，https://github.com/uzh-rpg/rpg_svo）中，都取得了很好的效果。</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 12pt">本文主要是参考《Video-based, Real-Time Multi View Stereo》，按照我自己的理解，从最基础的贝叶斯公式开始推导，一步步推导出最后的迭代公式，用最通俗易懂的方式，把深度滤波方法的来龙去脉讲清楚。 </span></p>
+<h2>1.测量值区间累加的方法</h2>
+<p><span style="font-size: 12pt">首先，是以前的基于投票的获取深度的方法。要有一个特征点，然后在其它帧找匹配。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163737628-1711403215.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">左图是该特征点在一幅图像上面的匹配，随着Z的变化，对应在极线上的不同投影点位
+置。该特征点图块经过仿射变化之后，与不同的投影点位置的图块进行NCC匹配，获取不同的匹配分数，然后记录极大值点，落在哪个Z值区间。从Zmin到
+Zmax分了50段区间。右图是把60幅图像这样的数组累加，把极大值点累加，记录在每个Z值区间出现的极大值的频数。 </span></p>
+<p><span style="font-size: 12pt">最后，会得到这样的结果，最后会收敛。分别对应5、10、20、100张图的时候的样子。 </span></p>
+<p>&nbsp; &nbsp;&nbsp;<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163737815-404623994.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">这种方法比较准确，但是需要记录大量的数据。比如上面（a），单是一幅图上，从Zmin到Zmax就分了50段，于是要用50个元素的数组来记录每段有无极大值。然后把60幅图像的数组都合并起来，得到（b）。 </span></p>
+<p><span style="font-size: 12pt">而且，即便能知道累加后最高的那个直方图对应的深度值，但不能知道，根据所有的测量结果所推算出来的深度值，也不知道，那个特征点对应的外点（假地图点）的概率。 </span></p>
+<h2>2.能推算深度值也能算外点概率的方法——穷举法</h2>
+<p><span style="font-size: 12pt">所以，要想出其它的办法，既可以综合所有的测量结果推算出深度值，也可以推算出这个特征点对应的外点的概率。 </span></p>
+<p><span style="font-size: 12pt">那么，就用另外一种方法，不再记录单幅图像上的所有极大值，而是只记录单幅图像上的最大值。同样地，也把所有的数组累加起来。积累了150幅图像的测量值之后，可以得到下图。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163739596-1164054527.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">那么，在这样的测量数据<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163739846-208752788.png" alt="">的情况下，从这些测量数据中，可以反映出这个点的真正的深度值应该是多少呢？是外点的概率又是多少呢？ </span></p>
+<p><span style="font-size: 12pt">用<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163740128-1260517404.png" alt="">表示该特征点真正的深度值，用<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163740471-1509666156.png" alt="">表示内点的概率。 </span></p>
+<p><span style="font-size: 12pt">所以，可以用概率方法表示如下，也就是后验概率。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163740737-359825385.png" alt=""></p>
+<p><span style="font-size: 12pt">要求出一组<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163741034-1307517827.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163741534-1349483879.png" alt="">，使得上面的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163741831-1180967306.png" alt="">最大。但是，直接算，算不出来。用贝叶斯公式来转换。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163742143-872575646.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">又因为<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163742534-1610591492.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163742831-854461178.png" alt="">的区间分布的先验值，就是每处都相同。 </span></p>
+<p><span style="font-size: 12pt"><span style="color: rgba(1, 1, 1, 1)">这里的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163743174-2054309469.png" alt="">都是指概率密度，就像是把1千克的质量分散在这么大的体积里，每个地方的密度。要变成概率，还需要乘以一个微分段<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163743346-1674941006.png" alt="">，但因为在等式两边都乘以同样的微分段，所以可以约掉了。贝叶斯公式也就可以同样适用于概率密度的推算了。概率密度与实际概率的关系，参考《从贝叶斯到beta分布》。</span></span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163743534-644213121.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">所以， </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163743753-1026496042.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">又因为<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163744018-1315293653.png" alt="">之间互相独立，所以， </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163744253-1197019218.png" alt=""></p>
+<p><span style="font-size: 12pt">也就是，找出一组<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163744487-1002811976.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163744706-2093618571.png" alt="">，使得<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163745003-1151127727.png" alt="">这个累乘结果最大。 </span></p>
+<p><span style="font-size: 12pt">而对其中的每一个元素，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163745237-1424769256.png" alt="">可以认为是，内点的高斯分布概率，加上，外点的概率，表示成如下公式。其中，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163745440-2023809079.png" alt="">是匹配点在极线上的一个像素的扰动，造成的对应点在深度上的变化。参考《视觉SLAM十四讲》13.2.3的《高斯分布的深度滤波器》。这里的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163745721-1117506971.png" alt="">都是指概率密度。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163745924-115418570.png" alt="" class="medium-zoom-image"></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163746128-2139632021.png" alt=""></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163746315-875708525.png" alt=""><span style="font-size: 12pt">在<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163746503-269730520.png" alt="">上，随着<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163746690-900663471.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163746878-1120395625.png" alt="">的调节，会变成如下不同的概率曲线， </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180406235736212-2123971796.jpg" alt="" class="medium-zoom-image"></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180407000442990-305092135.jpg" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">所以，现在已知有这样的确定的测量值。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163748471-1345065809.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">每个测量值都对应一个<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163748674-1461827626.png" alt="">，所有的累乘。目标是，通过调节<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163748862-728459803.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163749065-112487486.png" alt="">，调节曲线的形状，使得<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163749284-1614539539.png" alt="">这个累乘结果最大。其实，即便<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163749503-1362691693.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163749721-1219552567.png" alt="">相同，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163749924-2113645175.png" alt="">所在的区间相同，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163750221-83734713.png" alt="">也是不同的，因为<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163750424-839040329.png" alt="" class="medium-zoom-image">里面的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163750674-100624880.png" alt="">是由两帧相机的相对位置以及特征点的像素位置决定的，所以每个测量值的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163750987-372288581.png" alt="">都不相同。因为在该帧上面，假设在极线上测到的极大值点<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163751299-1911533344.png" alt="">，满足方差为1个像素的高斯分布，即真实的极大值点与测量点<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163751596-226271280.png" alt="">间满足这样的高斯分布。则计算出来的深度点<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163751878-418817.png" alt="">也会满足高斯分布，方差用<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163752174-846455346.png" alt="">表示，参考《视觉SLAM十四讲》的《深度滤波器》。</span></p>
+<p><span style="font-size: 12pt">但由于实际上<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163752909-1952555713.png" alt="">差别不大，为了思考上的方便，这里就先忽略掉<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163753112-1540752636.png" alt="">的差别。但实际计算上，还是会根据公式计算，考虑公式中<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163753331-169509916.png" alt="">的差别。 </span></p>
+<p><span style="font-size: 12pt">将<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163753596-417347232.png" alt="">展开，得到，</span></p>
+<p><span style="font-size: 12pt">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107164942440-770651086.png" alt="" class="medium-zoom-image"></span></p>
+<p><span style="font-size: 12pt">通过思考，会发现，测量值都是已知的固定的，就是上面的灰色的直方图，为了使得累乘结果最大，需要调节曲线，使得直方图高的地方概率高，就是曲线的形状接近于直方图的形状的时候，所有测量值对应的概率的累乘结果会是最大的。</span></p>
+<p><span style="font-size: 12pt">还是直接用穷举的方法来找，怎么样的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163754049-1256304888.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163754331-151599461.png" alt="">可以让累乘结果最大。通过穷举所有的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163754596-1106718186.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163754862-1398759669.png" alt="">，得到每个组合对应的累乘结果<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163755112-196188458.png" alt="">的值，画成三维图表示如下。分别对应5、10、20、100张图的时候的样子。 </span></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163755331-447114055.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">最后，可以收敛。根据穷举的结果，可以找到让累乘结果最大时的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163755534-2096169205.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163755737-1813100292.png" alt="">，也就是最终想得到的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163755909-678450333.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163756096-292915819.png" alt="">。 </span></p>
+<p><span style="font-size: 12pt">其实，上面的方法的本质是基于这样的一个假设，如果那个特征点是内点的话，最后形成
+的直方图会是中间非常凸起的形状。如果那个特征点是外点的话，则最后形成的直方图会是非常平坦的长方形的形状。所以，上面的方法也可以近似理解为，看最后
+形成的直方图的形状，分布与凸起形状和平坦的长方形形状的相似度。 </span></p>
+<p><span style="font-size: 12pt">但是，对一张直方图都要进行这样的穷举，计算量太大（<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163756331-47703819.png" alt="">分50段，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163756643-1324529701.png" alt="">分100段，要算5000种组合），而且还只是对应单个特征点。而且，每新来一张图片，新来一个测量值<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163756956-464436742.png" alt="">，调整直方图后，针对这个新的测量值<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163757221-745947486.png" alt="">，再穷举出一幅三维图<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163757424-1413454668.png" alt="">，然后之前算出来的三维图<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163757628-1139076211.png" alt="">再乘以新的这幅三维图<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163757862-1539085714.png" alt="">，也就是每种组合的计算结果对应相乘，得到新的累乘三维图<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163758159-485751077.png" alt="">，再在上面找峰值。公式如下。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163758424-972231466.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">问:上面的这种已知所有的测量值（直方图），然后穷举所有的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163758674-262080200.png" alt="">，求概率最大的地方，与卡尔曼滤波的用测量值更新得到真值的方法，有什么不同呢？首先，卡尔曼滤波只针对高斯分布成立，所以只对<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163758878-691420746.png" alt="">有效。那么就把<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163759237-306894962.png" alt="">都当成零，认为全是内点的情况下，两者的区别呢？ </span></p>
+<p><span style="font-size: 12pt">答：本质上是一样的，结果上也会是一样的，只是使用场景不同。这种方法的特点是，知道每一个测量值各自对应的方差<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163759409-779688314.png" alt="">，然后穷举所有的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163759628-2067439236.png" alt="">，
+使得累乘结果最大，就认为得到最大后验概率。这种穷举的方法，适合离线方法。而卡尔曼滤波，一步步迭代的，通过第一个测量值得到，预测值和对应的协方差。
+认为真值是不动的。然后用后面的测量值和各自对应的协方差，来更新。最后得到一个较准确的值。卡尔曼滤波的方法，适合在线的迭代的方法。在只有一个测量值
+的情况下，两者是几乎相同的。 </span></p>
+<p><span style="font-size: 12pt">如果在只有第一个测量值的情况下，上面的穷举方法，穷举的结果会发现，当<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163759878-854189021.png" alt="">，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163800253-2036220485.png" alt="">等于测量值的情况下，后验概率会是最大的。也就是说，在只有一个测量值的情况下，就直接认为它是内点。所以，需要多一些测量值才比较好。 </span></p>
+<h2>3.穷举法的改进方法，已知是否内点，推导出<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163800487-421150288.png" alt="">形式，用迭代加速计算</h2>
+<p><span style="font-size: 12pt">但是，每新来一个测量值都要针对新的测量值穷举，然后再两幅三维图相乘，计算量还是蛮大的，还有没有更方便计算的方法呢？ </span></p>
+<p><span style="font-size: 12pt">首先，对于这种穷举找最大值的方法，现在一般都是用凸优化方法来代替了。如果能计算
+出优雅的雅克比解析式的话，就可以用梯度下降法，高斯牛顿法或LM方法来快速找到极大值点（可以转换成极小值点来算，比如被1减）。但是，从展开的公式上
+看，也没有方便地计算雅克比的方法。如果不能方便地计算雅克比，那么就用数值扰动的方法来求雅克比，这就接近于穷举法了，但只是用数值扰动来算雅克比，沿
+着梯度变化找到极大值点，计算量应该还是比穷举法要小的。这就是一般的穷举法，凸优化法（有雅克比解析式，和，无雅克比解析式用数值扰动算雅克比）的关
+系。（http://www.cnblogs.com/ilekoaiq）但这些凸优化方法的前提都是，三维曲面上，只有一个极大值点。 </span></p>
+<p><span style="font-size: 12pt">通过对<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163800721-1039550707.png" alt="">展开， </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107165039206-1998989400.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">发现并没有什么方便计算的方法。主要是，其中的每个大括号里，都是由两项加在一起
+的，这样子，整个公式拆开来算的话，会非常庞大，而且找不出规律（虽然有点像快速傅里叶变换的蝶形乘法）。那么，有没有办法，把其中的加法消除掉呢？通过
+观察发现，其中的加法，是因为不知道这个点是内点还是外点，于是就两种情况都算。但是，如果通过其它方法，已经可以知道对应的这个点<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163801268-1586259627.png" alt="">是
+真实点高斯分布产生的，还是外点均匀分布产生的。那样子，就可以把大括号里面的加法消除掉，只保留对应的一项。要么是真实点高斯分布产生的，要么是外点均
+匀分布产生的。为了方便理解，可以先想象一种情况，就是它们全都是真实点高斯分布产生的。在论文中，是在极线上搜索，在一定搜索范围内能否找到极大值，如
+果能找到极大值，就把极大值测量点转换成的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163801503-56448984.png" alt="">认为是真实点高斯分布产生的；如果不能找到极大值，就把最大值测量点转换成的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163801690-454301355.png" alt="">认为是外点均匀分布产生的，其实这时候，也无所谓选取的最大值测量点的位置和转换后的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163801909-1607739039.png" alt="">的位置，因为产生它们的都是外点的均匀分布<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163802253-320123916.png" alt="">。 </span></p>
+<p><span style="font-size: 12pt">再回到原来的公式。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163802503-1023525574.png" alt=""></p>
+<p><span style="font-size: 12pt"> 设<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163802909-1691913662.png" alt="">表示这个测量点转换成的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163803112-737192273.png" alt="">是否是真实点高斯分布产生的。<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163803393-1360232405.png" alt="">，表示是真实点高斯分布产生的。<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163803596-645847120.png" alt="">，表示是外点的均匀分布产生的。则其中的每一项，可以表示如下，这也是最根本的推导。其中，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163803862-1140787389.png" alt="">，来自于<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163804065-1907287758.png" alt="">。单个字母<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163804268-1865023165.png" alt="">表示某个取值的时候，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163804456-1686866942.png" alt="">表示所有取值的概率累加，且<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163804690-1105725131.png" alt="">。要思考清楚各个变量之间的关系，参考《贝叶斯与维恩图》。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163804940-391808647.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">（其中，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163805159-627855691.png" alt="">（或者<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163805362-483180083.png" alt="">），也可以先看右边的这项<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163805581-1767993106.png" alt="">（或者<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163805768-1571780922.png" alt="">），再看左边的这项<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163805971-860943306.png" alt="">（<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163806159-130115348.png" alt="">），会更好理解。） </span></p>
+<p><span style="font-size: 12pt">那么，现在，我们已经通过了之前的那种策略，知道了当前点是否内点，记为<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163806440-1485398181.png" alt="">，相比只知道<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163806643-508432722.png" alt="">，又增加了信息。则在已知<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163806878-1523099113.png" alt="">、<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163807096-1862414668.png" alt="">的情况下，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163807456-223920742.png" alt="">的概率如以下公式所示。因为最根本的贝叶斯公式就是，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163807690-1544817023.png" alt="">。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107165136378-1413384214.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">上式中，有些是内点，有些是外点，根据<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163808128-677945668.png" alt="">来决定，各项的实际表达式会不同。为了数学形式上的简洁与统一，上式中的各项可以用以下公式来表示，同时表示了内点和外点的情况。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163808409-1001707265.png" alt=""></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163808768-1717478893.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">所以，上上式可以简洁地表示成，</span></p>
+<p><span style="font-size: 12pt">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107165841409-2029666420.png" alt="" class="medium-zoom-image"></span></p>
+<p><span style="font-size: 12pt">我们要算的公式中，自变量是<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163809174-510376904.png" alt="">，其它的量都是已知的。<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163809362-1209489588.png" alt="">是已知的，用<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163809706-1372979604.png" alt="">表示累加结果，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163809909-747472181.png" alt="">。<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163810253-402415424.png" alt="">都是已知的常数，就算<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163810487-1576458175.png" alt="">会随着<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163810878-287471795.png" alt="">的变化而变化，那也没关系，变量<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163811565-636960386.png" alt="">的变化不经过它们影响因变量结果，所以它们的累乘结果可以认为是一个已知的常数。参考《从贝叶斯到Beta分布》，其实最后要算的是各个（<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163811753-1601862074.png" alt="">组合）概率之间的比例，也可以理解为其实是要归一化的。所以，上式还可以写成更简洁的形式。（《Video-based, Real-Time Multi View Stereo》的附加材料的第一部分讲的就是这样的推导，但是它转成了<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163812003-1085412127.png" alt="">，又转回来，反而有些麻烦）。</span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163812268-678624120.png" alt="" class="medium-zoom-image"></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163812565-1109510165.png" alt=""><span style="font-size: 12pt">是一个<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163812768-756255223.png" alt="">分布。<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163813003-1940518024.png" alt="">是高斯分布的累乘，根据高斯分布的性质（以及2中的那个"隐含"高斯分布概率的推导），仍然还是高斯分布。所以，就用<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163813299-1795784107.png" alt="">的形式来表示。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163813940-1064364996.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">然后，就可以很方便地迭代计算了。其中，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163814331-1741826773.png" alt="">比较好算，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163814878-10185843.png" alt="">可以根据高斯分布乘法的性质，从<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163815440-819092041.png" alt="">开始，一步步迭代计算出来。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163815846-1128743851.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">当<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163816112-652435701.png" alt="">时，上式中<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163816346-1936639843.png" alt="">展开相乘，结合高斯分布乘法，可以得到， </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163816565-1326051367.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">由高斯分布乘法可得，参考《高斯分布的加减乘除法》《直观理解高斯函数相乘》《卡尔曼滤波基础》。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163816799-399478939.png" alt=""></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163817034-1703087194.png" alt=""></p>
+<p><span style="font-size: 12pt">如果<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163817237-1969538534.png" alt=""><span style="font-family: 宋体">，则<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163817503-2074046824.png" alt="">，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163817690-195928651.png" alt="">。</span> </span></p>
+<p><span style="font-size: 12pt">所以，迭代一下后，得到的新的表达式为， </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163817909-46625359.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">其中，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163818112-1109834418.png" alt="">，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163818487-1026088312.png" alt="">。这样子，每新来一个测量值，只需要迭代一下就可以，不用再两幅三维图相乘。 </span></p>
+<p><span style="font-size: 12pt">（而另一方面，如果不知道<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163818799-1802668085.png" alt="">的话，是没办法明确推导出上面的这样的Beta和高斯分离出来的公式的，只能用近似的方法。通过观察最后的收敛的三维图像，思考发现。当<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163819018-623717968.png" alt="">一定时，累乘结果峰值的位置主要是由<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163819331-1586599259.png" alt="">来决定的。也就是<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163819643-198652179.png" alt="">决定了曲线凸出来的地方，当曲线凸出来的地方的位置与直方图的高值地方接近的时候，累乘结果就能取到较大的值。当<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163819846-1125344598.png" alt="">值一定时，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163820128-461098234.png" alt="">的分布也是一个中间凸的曲线。<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163820487-2008327405.png" alt="">的分布和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163820674-434723607.png" alt="">的分布是分别穷举的，但不是独立的，因为在<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163820862-1898332206.png" alt="">不同的地方，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163821049-1668553163.png" alt="">的分布会发生变化，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163821253-490875398.png" alt="">的顶点位置会发生变化。但是，为了简化计算，可以认为<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163821440-1125678687.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163821643-1371481195.png" alt="">是独立的，所以分别用曲线去近似<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163821831-55021644.png" alt="">的分布和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163822018-486108829.png" alt="">的分布。） </span></p>
+<h2>4.更完整形式的迭代计算</h2>
+<p><span style="font-size: 12pt">因为根据我们的策略，我们可以知道这个测量点对应的是内点还是外点。但是，我们之前的策略只能判定明显的外点，如果不是明显的外点的话，就认为是内点，但是，真实的情况是，这时候认为的内点，其实还是有可能是外点的。那么，就要考虑这种更真实的情况。 </span></p>
+<p><span style="font-size: 12pt">当用之前的策略判定当前测量点为外点产生的时候，就认为它是由外点产生的。直接使用第3部分中的迭代方法，更新这个外点。但是，当判定不是外点的时候，就仍然还是要用第2部分中的方法。 </span></p>
+<p><span style="font-size: 12pt">设之前的部分已经满足<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163822206-1147702155.png" alt="">的形式，用公式表示如下。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163822440-1010252837.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">则，如果新来一个测量点，没有被判断为外点。则公式更新如下。 </span></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107170317471-1272906412.png" alt="" class="medium-zoom-image"></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107170423221-421890141.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">根据高斯分布乘法的性质，处理上式中的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163822987-821572394.png" alt="">，参考《高斯分布的加减乘除法》。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163823221-1185252246.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">用<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163823409-1848551778.png" alt="">表示<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163823628-1223085385.png" alt="">，用<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163823878-1987711821.png" alt="">表示<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163824190-290951471.png" alt="">。<span style="color: rgba(255, 0, 0, 1)">（注意，这里与《Video-based, Real-Time Multi View Stereo》的附加材料里的公式不一样，因为我认为《Video-based, Real-Time Multi View Stereo》的附加材料里的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163824378-1163898376.png" alt="">的表达式写错了。）</span>则上上式可以表示为。</span></p>
+<p><span style="font-size: 12pt">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107170546362-974916100.png" alt="" class="medium-zoom-image"></span></p>
+<p><span style="font-size: 12pt">这时候，结果是，两个<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163824831-1441956242.png" alt="">形式的相加。相当于两幅三维图叠加（想象两个高斯分布在概率轴方向上叠加在一起，形成了两个山峰）。相加之后的结果，不会再是<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163825034-1749200688.png" alt="">的形式，或者其它的单一模型的形式。在这里，只能近似地认为，相加后的结果接近于<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163825206-641311882.png" alt="">的形式，这要依赖于上式中的，（1）<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163825409-617611611.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163825643-1249682820.png" alt="">很接近使得<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163825846-858872621.png" alt="">接近于1；（2）<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163826112-1634376260.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163826299-1705506216.png" alt="">，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163826503-1264590628.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163826706-362023808.png" alt="">很接近，使得<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163826909-1888580940.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163827112-234705190.png" alt="">很接近；（3）<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163827331-974233488.png" alt="">和<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163827503-851611757.png" alt="">两个数都很大，使得<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163827706-123070727.png" alt="">接近于<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163827893-633739194.png" alt="">；（4）<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163828128-1612014319.png" alt="">很小，使得左边项可以忽略。 </span></p>
+<p><span style="font-size: 12pt">所以，如果近似地认为，相加后的结果接近于<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163828393-814962061.png" alt="">的形式的话，则用公式表示如下。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107170624221-669152810.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">用一阶矩和二阶矩近似的方法，把新的参数估计出来。 </span></p>
+<p><span style="font-size: 12pt">就是用新的单一模型的概率密度三维图去近似旧的多模型叠加的概率密度的三维图。让两者的自变量轴（x、y轴）的一阶矩和二阶矩近似。用<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163828956-1107041988.png" alt="">表示旧的多模型叠加的概率密度的三维图，用<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163829206-2028130783.png" alt="">表示新的单一模型的概率密度三维图。其实这个三维图的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163829409-1891670366.png" alt="">轴，就是表示<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163829596-1532117409.png" alt="">的那一个轴，是无穷大的，只是最后显示的时候，取了中间的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163829815-1182734754.png" alt="">部分。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107170710784-898198762.png" alt="" class="medium-zoom-image"></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163830253-1224144902.png" alt=""></p>
+<p><span style="font-size: 12pt">参考《高斯分布的各阶矩》，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163830487-1453677428.png" alt="">图上的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163830690-697478976.png" alt="">的一阶矩为<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163830893-669630846.png" alt="">， </span></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107170750253-870338536.png" alt="" class="medium-zoom-image"></p>
+<p>&nbsp;<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163831362-2088092219.png" alt=""><span style="font-size: 12pt">图上的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163831581-2132593116.png" alt="">的二阶矩为<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163831815-20732013.png" alt="">，</span></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107170825893-953113675.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">参考《常用分布函数及特征函数》，<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163832315-80790649.png" alt="">图上的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163832549-857256674.png" alt="">的一阶矩为<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163832737-1877949838.png" alt="">， </span></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107170902628-2096729449.png" alt="" class="medium-zoom-image"></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163833206-496519833.png" alt=""><span style="font-size: 12pt">图上的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163833424-2088232942.png" alt="">的二阶矩为<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163833612-910143214.png" alt="">，</span></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107171023549-1913827532.png" alt="" class="medium-zoom-image"></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163834112-1316543473.png" alt=""><span style="font-size: 12pt">图上的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163834284-1301978707.png" alt="">的一阶矩为， </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163834487-1639522791.png" alt="" class="medium-zoom-image"></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163834690-663606912.png" alt=""><span style="font-size: 12pt">图上的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163834909-747885674.png" alt="">的二阶矩为， </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163835143-2130227466.png" alt="" class="medium-zoom-image"></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163835346-1360375861.png" alt=""><span style="font-size: 12pt">图上的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163835549-1520927300.png" alt="">的一阶矩为， </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163835799-131182402.png" alt="" class="medium-zoom-image"></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163835987-2005186438.png" alt=""><span style="font-size: 12pt">图上的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163836174-296273906.png" alt="">的二阶矩为， </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163836409-2134914787.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">所以，联立方程，让<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163836581-1432112077.png" alt="">图的矩去等于<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163836784-812893486.png" alt="">图的矩，也就是<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163837018-1260451218.png" alt="">图上的参数所要满足的约束。 </span></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107171122096-1575631564.png" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">经过计算，最后得到迭代公式，</span></p>
+<p><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180407102637958-1504514947.jpg" alt="" class="medium-zoom-image"></p>
+<p><span style="font-size: 12pt">相当于是用一个Beta分布来近似<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163837768-761281586.png" alt="">的分布，用一个高斯分布来近似<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163837987-1332454194.png" alt="">的分布。 </span></p>
+<p><span style="font-size: 12pt">于是，最终就推导出了这么一种简洁的迭代公式。每新来一个测量值，迭代一下能快速计算出新的峰值点。相比第二部分，不用再针对新的测量值穷举所有的<img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163838174-1621038446.png" alt="">组合后再两幅三维图相乘；相比第三部分，更加接近真实的情况。 </span></p>
+<p style="text-align: center"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180107163838409-1986572120.png" alt="" class="medium-zoom-image"></p>
+<h2>5.总结</h2>
+<p><span style="font-size: 12pt">深度滤波方法，理论推导非常优美，全部都由最简洁的贝叶斯公式推导而来，它尽可能地把所有的观测信息都利用上；还能进行快速迭代，实际运行的效果也很棒。应用在三维重建中，可以让三<span style="font-size: 16px">维重</span>建出来的模型更加真实;应用在VR\AR空间定位中，可以让跟踪定位更加准确。相信它还可以被应用在更多的跟踪、建图算法中。</span></p>
+<p>&nbsp;</p>
+<h2>6.求赞赏</h2>
+<p><span style="font-size: 16px">您觉得，本文值多少？&nbsp;</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: 12pt"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/699318-20180407001221081-397284790.jpg" alt=""></span></p>
+<p>&nbsp;</p>
+<h2>7.参考文献</h2>
+<ol>
+<li>
+<div style="text-align: justify"><span style="color: rgba(34, 34, 34, 1); font-family: Times New Roman; font-size: 10pt; background-color: rgba(255, 255, 255, 1)">George
+ Vogiatzis, Carlos Hernandez. Video-based, real-time multi-view stereo 
+[J]. Image &amp; Vision Computing, 2011, 29(7):434-441.</span></div>
+</li>
+<li>
+<div style="text-align: justify"><span style="color: rgba(34, 34, 34, 1); font-family: Times New Roman; font-size: 10pt; background-color: rgba(255, 255, 255, 1)">Forster
+ C, Pizzoli M, Scaramuzza D. SVO: Fast semi-direct monocular visual 
+odometry[C]// IEEE International Conference on Robotics and Automation. 
+IEEE, 2014:15-22.</span></div>
+</li>
+<li>
+<div style="text-align: justify"><span style="color: rgba(34, 34, 34, 1); font-family: Times New Roman; font-size: 10pt; background-color: rgba(255, 255, 255, 1)">Pizzoli
+ M, Forster C, Scaramuzza D. REMODE: Probabilistic, monocular dense 
+reconstruction in real time[C]// IEEE International Conference on 
+Robotics and Automation. IEEE, 2014:2609-2616.</span></div>
+</li>
+<li>
+<div style="text-align: justify"><span style="color: rgba(34, 34, 34, 1); font-size: 10pt"><span style="font-family: 宋体; background-color: rgba(255, 255, 255, 1)">高翔</span><span style="font-family: Times New Roman; background-color: rgba(255, 255, 255, 1)">.</span><span style="font-family: 宋体; background-color: rgba(255, 255, 255, 1)">视觉</span><span style="font-family: Times New Roman; background-color: rgba(255, 255, 255, 1)">SLAM</span><span style="font-family: 宋体; background-color: rgba(255, 255, 255, 1)">十四讲</span><span style="font-family: Times New Roman; background-color: rgba(255, 255, 255, 1)">[M].</span><span style="font-family: 宋体; background-color: rgba(255, 255, 255, 1)">北京</span><span style="font-family: Times New Roman; background-color: rgba(255, 255, 255, 1)">:</span><span style="font-family: 宋体; background-color: rgba(255, 255, 255, 1)">电子工业出版社</span><span style="font-family: Times New Roman; background-color: rgba(255, 255, 255, 1)">,2017:325-327.</span></span></div>
+</li>
+</ol>
+<p style="text-align: right">&nbsp;</p>
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block">
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(8228324,cb_blogId,1);green_channel_success(this,'谢谢推荐！');">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow('6f40e42c-007a-e411-b908-9dcfd8948a71');" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/ilekoaiq/" target="_blank"><img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/20180406161953.png" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/ilekoaiq/">极品巧克力</a><br>
+            <a href="https://home.cnblogs.com/u/ilekoaiq/followees/">关注 - 1</a><br>
+            <a href="https://home.cnblogs.com/u/ilekoaiq/followers/">粉丝 - 99</a>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow">
+                <a href="javascript:void(0);" onclick="follow('6f40e42c-007a-e411-b908-9dcfd8948a71');return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(8228324,'Digg')">
+        <span class="diggnum" id="digg_count">2</span>
+    </div>
+    <div class="buryit" onclick="votePost(8228324,'Bury')">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a href="https://www.cnblogs.com/ilekoaiq/p/8710812.html" class="p_n_p_prefix">« </a> 上一篇：    <a href="https://www.cnblogs.com/ilekoaiq/p/8710812.html" title="发布于 2018-04-15 20:52">Google Cardboard的九轴融合算法——基于李群的扩展卡尔曼滤波</a>
+    <br>
+    <a href="https://www.cnblogs.com/ilekoaiq/p/8659631.html" class="p_n_p_prefix">» </a> 下一篇：    <a href="https://www.cnblogs.com/ilekoaiq/p/8659631.html" title="发布于 2018-04-15 21:08">SVO详细解读</a>
+
+</div>
+</div>
+        </div>
+        <p class="postfoot">
+            posted on 
+<span id="post-date">2018-04-15 21:04</span>&nbsp;
+<a href="https://www.cnblogs.com/ilekoaiq/">极品巧克力</a>&nbsp;
+阅读(<span id="post_view_count">2877</span>)&nbsp;
+评论(<span id="post_comment_count">1</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=8228324" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(8228324);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: '', targetType: 'blogPost', targetId: '8228324', targetLink: 'https://www.cnblogs.com/ilekoaiq/p/8228324.html', title: '深度滤波器详细解读' })">举报</a>
+        </p>
+    </div>
+</div>
+
+
+<script src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/highlight.js" async="" onload="markdown_highlight()"></script>
+<script>
+    var allowComments = true, cb_blogId = 405135, cb_blogApp = 'ilekoaiq', cb_blogUserGuid = '6f40e42c-007a-e411-b908-9dcfd8948a71';
+    var cb_entryId = 8228324, cb_entryCreatedDate = '2018-04-15 21:04', cb_postType = 1;
+    updatePostStats(
+        [cb_entryId],
+        function(id, count) { $("#post_view_count").text(count) },
+        function(id, count) { $("#post_comment_count").text(count) })
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");
+</script>
+
+<a name="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="#" onclick="return RefreshPage();">刷新页面</a><a href="#top">返回顶部</a></div>
+    <div id="comment_form_container" style="visibility: visible;"><div class="login_tips">
+    登录后才能查看或发表评论，立即 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return account.login('!comments');">登录</a> 或者
+    <a href="https://www.cnblogs.com/">逛逛</a> 博客园首页
+</div>
+</div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+    <div id="ad_t2"><a href="https://heapdump.wjx.cn/vj/rX5RbFn.aspx?udsid=682731" target="_blank" onclick="gtag('event', 'click', {'event_category': 'ad', 'event_label': 'T2-HeapDump'})">【推荐】参与 HeapDump 性能社区开发者调研问卷，领取各种小礼品！</a><br><a href="http://www.uccpsoft.com/index.htm" target="_blank" onclick="gtag('event', 'click', {'event_category': 'ad', 'event_label': 'T2-ucancode'})">【推荐】跨平台组态\工控\仿真\CAD 50万行C++源码全开放免费下载！</a><br><a href="https://www.cnblogs.com/cmt/p/15375689.html" target="_blank" onclick="gtag('event', 'click', {'event_category': 'ad', 'event_label': 'T2-并行科技'})">【推荐】并行超算云面向博客园粉丝推出“免费算力限时申领”特别活动</a><br><a href="https://brands.cnblogs.com/huawei/p/2357" target="_blank" onclick="gtag('event', 'click', {'event_category': 'ad', 'event_label': 'T2-华为专区'})">【推荐】华为全面助力青少年编程教育普及，花瓣少儿编程正式上线</a><br></div>
+    <div id="opt_under_post"></div>
+    <div id="cnblogs_c1" class="under-post-card">
+             <a onclick="ga('send', 'event', 'banner', 'click', 'Pangle-C1')" target="_blank" rel="nofollow" href="https://c.gridsumdissector.com/r/?gid=gad_545_mzyfo0un&amp;ck=46&amp;adk=566&amp;autorefresh=__AUTOREFRESH__">
+                <img style="width: 300px; height: 250px;" src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/35695-20211008160624813-1694591598.jpg" alt="" onload="impressC1()">
+             </a>
+    </div>
+    <div id="under_post_card1"><div class="under-post-card">
+<b>编辑推荐：</b>
+<br>
+
+· <a href="https://www.cnblogs.com/xiaoxiaotank/p/15468491.html" target="_blank">理解 ASP.NET Core - 路由(Routing)</a>
+    <br>
+· <a href="https://www.cnblogs.com/netxiaohui/p/15468786.html" target="_blank">写给程序员的一些建议</a>
+    <br>
+· <a href="https://www.cnblogs.com/xiyuanMore/p/15463792.html" target="_blank">在 ASP.NET Core Web API中使用 Polly 构建弹性容错的微服务</a>
+    <br>
+· <a href="https://www.cnblogs.com/strick/p/15179666.html" target="_blank">带团队后的日常思考（五）</a>
+    <br>
+· <a href="https://www.cnblogs.com/thanks/p/15452702.html" target="_blank">聊聊我在微软外服的工作经历及一些个人见解</a>
+    <br>
+</div></div>
+    <div id="under_post_card2"><div class="itnews under-post-card">
+    <b>最新新闻</b>：
+    <br>
+ ·          <a href="https://news.cnblogs.com/n/704938/" target="_blank">城市太吵了，不如让植物唱歌给你听（2021-10-29 16:30）</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/704937/" target="_blank">先把鸿蒙 3 放一放，华为的未来在万物智联的生态里（2021-10-29 16:18）</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/704936/" target="_blank">《沙丘》3D 版观看体验远不如 2D，中国观众受够「3D 大片」了（2021-10-29 16:09）</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/704935/" target="_blank">人到中年，扎克伯格改名“换命”（2021-10-29 16:07）</a>
+        <br>
+ ·          <a href="https://news.cnblogs.com/n/704934/" target="_blank">OPPO三季度全球出货量同比增长18% 排名第四（2021-10-29 15:52）</a>
+        <br>
+    » <a href="https://news.cnblogs.com/" title="IT 新闻" target="_blank">更多新闻...</a>
+</div></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+       var commentManager = new blogCommentManager();
+       commentManager.renderComments(0);
+       fixPostBody();
+setTimeout(function() { incrementViewCount(cb_entryId); }, 50);       deliverT2();
+       deliverC1C2();
+       loadNewsAndKb();
+LoadPostCategoriesTags(cb_blogId, cb_entryId);       LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+       GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+       loadOptUnderPost();
+       GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+    </script>
+</div>
+
+
+
+</div>
+</div>
+<div id="leftmenu">
+
+
+<h3>导航</h3>
+<ul>
+    <li>
+        <a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+
+    </li>
+    <li>
+        
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/ilekoaiq/">
+首页</a>
+
+    </li>
+    <li>
+        
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+
+    </li>
+    <li>
+        
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B">
+联系</a>
+    </li>
+    <li>
+        
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/ilekoaiq/rss/">
+订阅</a>
+        
+<a id="blog_nav_rss_image" href="https://www.cnblogs.com/ilekoaiq/rss/">
+    <img src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/xml.gif" alt="订阅">
+</a>
+    </li>
+    <li>
+        
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+
+    </li>
+</ul>
+
+
+<div id="blog-calendar" style="">
+
+<table id="blogCalendar" class="Cal" title="Calendar" cellspacing="0" cellpadding="0" border="0">
+    <tbody>
+        <tr>
+            <td colspan="7">
+                <table class="CalTitle" cellspacing="0" border="0">
+                    <tbody>
+                        <tr>
+                            <td class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar('2021/09/29'); return false;">&lt;</a>
+                            </td>
+                            <td align="center">2021年10月</td>
+                            <td class="CalNextPrev" align="right">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar('2021/11/29'); return false;">&gt;</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    <tr>
+        <th class="CalDayHeader" abbr="日" scope="col" align="center">日</th>
+        <th class="CalDayHeader" abbr="一" scope="col" align="center">一</th>
+        <th class="CalDayHeader" abbr="二" scope="col" align="center">二</th>
+        <th class="CalDayHeader" abbr="三" scope="col" align="center">三</th>
+        <th class="CalDayHeader" abbr="四" scope="col" align="center">四</th>
+        <th class="CalDayHeader" abbr="五" scope="col" align="center">五</th>
+        <th class="CalDayHeader" abbr="六" scope="col" align="center">六</th>
+    </tr>
+            <tr>
+                            <td class="CalOtherMonthDay" align="center">26</td>
+                            <td class="CalOtherMonthDay" align="center">27</td>
+                            <td class="CalOtherMonthDay" align="center">28</td>
+                            <td class="CalOtherMonthDay" align="center">29</td>
+                            <td class="CalOtherMonthDay" align="center">30</td>
+                        <td class="" align="center">
+                            1
+                        </td>
+                    <td class="CalWeekendDay" align="center">
+                        2
+                    </td>
+            </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            3
+                        </td>
+                            <td class="" align="center">
+                                4
+                            </td>
+                            <td class="" align="center">
+                                5
+                            </td>
+                            <td class="" align="center">
+                                6
+                            </td>
+                            <td class="" align="center">
+                                7
+                            </td>
+                            <td class="" align="center">
+                                8
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            9
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            10
+                        </td>
+                            <td class="" align="center">
+                                11
+                            </td>
+                            <td class="" align="center">
+                                12
+                            </td>
+                            <td class="" align="center">
+                                13
+                            </td>
+                            <td class="" align="center">
+                                14
+                            </td>
+                            <td class="" align="center">
+                                15
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            16
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            17
+                        </td>
+                            <td class="" align="center">
+                                18
+                            </td>
+                            <td class="" align="center">
+                                19
+                            </td>
+                            <td class="" align="center">
+                                20
+                            </td>
+                            <td class="" align="center">
+                                21
+                            </td>
+                            <td class="" align="center">
+                                22
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            23
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            24
+                        </td>
+                            <td class="" align="center">
+                                25
+                            </td>
+                            <td class="" align="center">
+                                26
+                            </td>
+                            <td class="" align="center">
+                                27
+                            </td>
+                            <td class="" align="center">
+                                28
+                            </td>
+                            <td class="CalTodayDay" align="center">
+                                29
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            30
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            31
+                        </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                1
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                2
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                3
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                4
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                5
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            6
+                        </td>
+                </tr>
+    </tbody>
+</table></div><script>loadBlogDefaultCalendar();</script>
+<div id="sidebar_news" class="newsItem"><meta name="vs_showGrid" content="False">
+<h3>公告</h3>
+
+<div id="blog-news">
+    领英：https://www.linkedin.com/in/yuanli-zheng-31063459/
+    <div id="profile_block">
+        昵称：
+        <a href="https://home.cnblogs.com/u/ilekoaiq/">
+            极品巧克力
+        </a>
+        <br>
+        园龄：
+        <a href="https://home.cnblogs.com/u/ilekoaiq/" title="入园时间：2014-12-02">
+            6年10个月
+        </a>
+        <br>
+        粉丝：
+        <a href="https://home.cnblogs.com/u/ilekoaiq/followers/">
+            99
+        </a>
+        <br>
+        关注：
+        <a href="https://home.cnblogs.com/u/ilekoaiq/followees/">
+            1
+        </a>
+        <div id="p_b_follow">
+<a href="javascript:void(0)" onclick="follow('6f40e42c-007a-e411-b908-9dcfd8948a71')">+加关注</a></div>
+        <script>getFollowStatus('6f40e42c-007a-e411-b908-9dcfd8948a71');</script>
+    </div>
+</div>
+
+</div>
+<div id="sidebar_c3"></div>
+<div id="blog-sidecolumn"><!-- 搜索 -->
+<div id="sidebar_search" class="sidebar-block">
+    <div id="sidebar_search" class="mySearch">
+        <h3 class="catListTitle">搜索</h3>
+        <div id="sidebar_search_box">
+            <div id="widget_my_zzk" class="div_my_zzk">
+                <input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk">
+            </div>
+            <div id="widget_my_google" class="div_my_zzk">
+                <input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 常用链接 -->
+<div id="sidebar_shortcut" class="sidebar-block">
+<h3 class="catListTitle">
+常用链接
+</h3>
+<ul>
+    
+<li><a href="https://www.cnblogs.com/ilekoaiq/p/" title="我的博客的随笔列表">我的随笔</a></li>
+<li><a href="https://www.cnblogs.com/ilekoaiq/MyComments.html" title="我的发表过的评论列表">我的评论</a></li>
+<li><a href="https://www.cnblogs.com/ilekoaiq/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li>
+<li><a href="https://www.cnblogs.com/ilekoaiq/RecentComments.html" title="我的博客的评论列表">最新评论</a></li>
+<li><a href="https://www.cnblogs.com/ilekoaiq/tag/" title="我的博客的标签列表">我的标签</a></li>
+
+</ul>
+</div>
+
+<!-- 最新随笔 -->
+
+
+<!-- 我的标签 -->
+<div id="sidebar_toptags" class="sidebar-block">
+<h3>我的标签</h3>
+<div id="MyTag">
+    <ul>
+                <li>
+            <a href="https://www.cnblogs.com/ilekoaiq/tag/IMU%E8%9E%8D%E5%90%88/">IMU融合<span class="tag-count">(1)</span></a>
+        </li>
+    
+
+    </ul>
+</div>
+</div>
+
+<!-- 积分与排名 -->
+
+
+<!-- 随笔分类、随笔档案、文章分类、新闻分类、相册、链接 -->
+<div id="sidebar_categories">
+
+    <h3>
+        
+随笔档案
+
+
+
+    </h3>
+    <ul>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/ilekoaiq/archive/2018/07.html" rel="" target="">
+    2018年7月(3)
+</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/ilekoaiq/archive/2018/04.html" rel="" target="">
+    2018年4月(5)
+</a>
+
+            </li>
+        
+    </ul>
+</div>
+
+<!-- 最新评论 -->
+<!-- 阅读排行榜 -->
+<div id="sidebar_topviewedposts" class="sidebar-block">
+<div id="topview_posts_wrap">
+    <h3 class="catListTitle">阅读排行榜</h3>
+    <div id="TopViewPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8836970.html">
+                            1. VINS-mono详细解读(31674)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8659631.html">
+                            2. SVO详细解读(18367)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8849217.html">
+                            3. Madgwick算法详细解读(10493)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/9311357.html">
+                            4. 相机IMU融合四部曲（三）:MSF详细解读与使用(9965)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8710812.html">
+                            5. Google Cardboard的九轴融合算法——基于李群的扩展卡尔曼滤波(7818)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div></div>
+
+<!-- 评论排行榜 -->
+<div id="sidebar_topcommentedposts" class="sidebar-block"><div id="topfeedback_posts_wrap">
+    <h3 class="catListTitle">评论排行榜</h3>
+    <div id="TopFeedbackPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/9311357.html">
+                            1. 相机IMU融合四部曲（三）:MSF详细解读与使用(33)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8836970.html">
+                            2. VINS-mono详细解读(11)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8710812.html">
+                            3. Google Cardboard的九轴融合算法——基于李群的扩展卡尔曼滤波(6)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/8849217.html">
+                            4. Madgwick算法详细解读(4)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/ilekoaiq/p/9266036.html">
+                            5. 相机IMU融合四部曲（二）：误差状态四元数详细解读(1)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div></div>
+
+<!-- 推荐排行榜 -->
+<div id="sidebar_topdiggedposts" class="sidebar-block">
+<div id="topdigg_posts_wrap">
+    <div class="catListView">
+        <h3 class="catListTitle">推荐排行榜</h3>
+        <div id="TopDiggPostsBlock">
+            <ul style="word-break: break-all">
+                        <li>
+                            <a href="https://www.cnblogs.com/ilekoaiq/p/8836970.html">
+                                1. VINS-mono详细解读(7)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/ilekoaiq/p/9311357.html">
+                                2. 相机IMU融合四部曲（三）:MSF详细解读与使用(5)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/ilekoaiq/p/8710812.html">
+                                3. Google Cardboard的九轴融合算法——基于李群的扩展卡尔曼滤波(4)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/ilekoaiq/p/8659631.html">
+                                4. SVO详细解读(2)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/ilekoaiq/p/8228324.html">
+                                5. 深度滤波器详细解读(2)
+                            </a>
+                        </li>
+            </ul>
+        </div>
+    </div>
+</div></div><div id="sidebar_recentcomments" class="sidebar-block"><div id="recent_comments_wrap" class="RecentComment">
+    <h3 class="catListTitle">最新评论</h3>
+    <div class="RecentCommentBlock">
+        <ul>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/ilekoaiq/p/8849217.html">1. Re:Madgwick算法详细解读</a></li>
+                    <li class="recent_comment_body"><p>刚学不久，但我感觉两次叉乘得出来的旋转矩阵未必比梯度下降法得出来的误差要小。</p>
+</li>
+                    <li class="recent_comment_author">--里昂月</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/ilekoaiq/p/9311357.html">2. Re:相机IMU融合四部曲（三）:MSF详细解读与使用</a></li>
+                    <li class="recent_comment_body"><p>楼主您好，我最近也开始研究这个算法，想向您请教一个问题：ORBSLAM输出的位姿应该是在相机坐标系吗，如果在相机坐标系下，那传进msf的时候是不是需要坐标系同步呀？</p>
+</li>
+                    <li class="recent_comment_author">--蹦跶妞儿</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/ilekoaiq/p/8849217.html">3. Re:Madgwick算法详细解读</a></li>
+                    <li class="recent_comment_body">觉得#1楼说的有道理，对于矢量定姿问题，Wahba问题已经有非常详细的解了，但是原文中通过假设ut是一个非常大的值，即#1楼贴出的公式（7）已经后面的公式，来推导融合公式，感觉这个过程写得有点绕，为何...</li>
+                    <li class="recent_comment_author">--yuanliangx</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/ilekoaiq/p/9311357.html">4. Re:相机IMU融合四部曲（三）:MSF详细解读与使用</a></li>
+                    <li class="recent_comment_body">@极品巧克力 @jessieniyang 1.我是按照（）的方法，先把viconpos_sensor.launch的例程跑起来。然后再在这个基础上修改的。我自己用ORBSLAM2跑Euroc的V201...</li>
+                    <li class="recent_comment_author">--meng100</li>
+                    <li class="recent_comment_title"><a href="https://www.cnblogs.com/ilekoaiq/p/8710812.html">5. Re:Google Cardboard的九轴融合算法——基于李群的扩展卡尔曼滤波</a></li>
+                    <li class="recent_comment_body"><p>博主您好，请问这个代码是否有C语言版本呢，非常感谢</p>
+</li>
+                    <li class="recent_comment_author">--gouhuo</li>
+        </ul>
+    </div>
+</div></div>
+
+
+</div>
+                    <script>loadBlogSideColumn();</script>
+
+</div>
+</div>
+<div class="clear"></div>
+<div id="footer">
+<p id="footer">
+	Powered by: 
+	<br>
+	
+	<a href="https://www.cnblogs.com/" id="footer_site_link">博客园</a>
+	<br>
+	Copyright © 2021 极品巧克力
+<br><span id="poweredby">Powered by .NET 6 on Kubernetes</span>
+
+</p>
+
+
+</div>
+</div>
+
+
+    
+
+    <input type="hidden" id="antiforgery_token" value="CfDJ8FO3GXnjClZGrNGr2Ic8Z1qaurA4D-4RYUcpND0BjYIMLO-7GOqCsTIII29DDSDUVbZTzQB-SeBIvXHnW3zbhHP2n6Iq-BwdncmGRKTDoeiX69B97m8IIBcSMUoznpmeqatMIY0dqa5QE2dAvhPrLAw">
+    <script async="" src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/js.js"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    var kv = getGACustom();
+    if (kv) {
+        gtag('set', kv);
+    }
+    gtag('config', 'UA-476124-1');
+    </script>
+    <script defer="defer" src="%E6%B7%B1%E5%BA%A6%E6%BB%A4%E6%B3%A2%E5%99%A8%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%20-%20%E6%9E%81%E5%93%81%E5%B7%A7%E5%85%8B%E5%8A%9B%20-%20%E5%8D%9A%E5%AE%A2%E5%9B%AD_files/hm.js"></script>
+
+
+</body></html>

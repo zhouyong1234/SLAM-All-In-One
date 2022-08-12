@@ -1,0 +1,393 @@
+make all --print-data-base --no-builtin-variables --no-builtin-rules --question
+make: *** No rule to make target 'all'.  Stop.
+
+# GNU Make 4.1
+# Built for x86_64-pc-linux-gnu
+# Copyright (C) 1988-2014 Free Software Foundation, Inc.
+# License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+# This is free software: you are free to change and redistribute it.
+# There is NO WARRANTY, to the extent permitted by law.
+ 
+
+# Make data base, printed on Thu Aug 11 18:24:35 2022
+
+# Variables
+
+# automatic
+<D = $(patsubst %/,%,$(dir $<))
+# automatic
+?F = $(notdir $?)
+# environment
+DESKTOP_SESSION = ubuntu
+# default
+.SHELLFLAGS := -c
+# environment
+SNAP_COMMON = /var/snap/code/common
+# environment
+XDG_SESSION_TYPE = x11
+# environment
+UPSTART_INSTANCE = 
+# automatic
+?D = $(patsubst %/,%,$(dir $?))
+# automatic
+@D = $(patsubst %/,%,$(dir $@))
+# environment
+XAUTHORITY = /home/touchair/.Xauthority
+# environment
+ 
+GDMSESSION = ubuntu
+# environment
+XMODIFIERS = @im=fcitx
+# makefile
+CURDIR := /home/touchair/gnss_ws/src/SLAM多传感器融合建图/Unmanned-car-with-SLAM-and-Navigation/Software/Mapping/测试框架/A-LOAM
+# makefile
+SHELL = /bin/sh
+# environment
+SNAP_DATA = /var/snap/code/104
+# environment
+UPSTART_JOB = unity7
+# environment
+VTE_VERSION = 4205
+# environment
+VSCODE_NLS_CONFIG = {"locale":"zh-cn","availableLanguages":{"*":"zh-cn"},"_languagePackId":"08bdb29c43b4c03defdaaecc51ad48b6.zh-cn","_translationsConfigFile":"/home/touchair/.config/Code/clp/08bdb29c43b4c03defdaaecc51ad48b6.zh-cn/tcf.json","_cacheRoot":"/home/touchair/.config/Code/clp/08bdb29c43b4c03defdaaecc51ad48b6.zh-cn","_resolvedLanguagePackCoreLocation":"/home/touchair/.config/Code/clp/08bdb29c43b4c03defdaaecc51ad48b6.zh-cn/6d9b74a70ca9c7733b29f0456fd8195364076dda","_corruptedFile":"/home/touchair/.config/Code/clp/08bdb29c43b4c03defdaaecc51ad48b6.zh-cn/corrupted.info","_languagePackSupport":true}
+# environment
+XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/usr/share/upstart/xdg:/etc/xdg
+# environment
+SNAP_INSTANCE_NAME = code
+# environment
+SNAP_ARCH = amd64
+# makefile
+MAKEFILE_LIST := 
+# automatic
+@F = $(notdir $@)
+# environment
+GIO_LAUNCHED_DESKTOP_FILE = /home/touchair/.local/share/applications/x-terminal-emulator.desktop
+# 'override' directive
+GNUMAKEFLAGS := 
+# environment
+SESSIONTYPE = gnome-session
+# environment
+MANDATORY_PATH = /usr/share/gconf/ubuntu.mandatory.path
+# environment
+XDG_DATA_DIRS = /usr/share/ubuntu:/usr/share/gnome:/usr/local/share:/usr/share:/var/lib/snapd/desktop
+# environment
+ROS_ETC_DIR = /opt/ros/kinetic/etc/ros
+# environment
+DBUS_SESSION_BUS_ADDRESS = unix:abstract=/tmp/dbus-6TFkk8rFDJ
+# environment
+ROS_PACKAGE_PATH = /home/touchair/one_liom/one_liom3/src:/home/touchair/one_liom/one_liom2/src:/home/touchair/one_liom/one_liom1/src:/opt/ros/kinetic/share
+# environment
+UNITY_DEFAULT_PROFILE = unity-lowgfx
+# environment
+ROS_PYTHON_VERSION = 2
+# environment
+LESSOPEN = | /usr/bin/lesspipe %s
+# environment
+VSCODE_CWD = /home/touchair/gnss_ws/src/SLAM多传感器融合建图/Unmanned-car-with-SLAM-and-Navigation/Software/Mapping/测试框架/A-LOAM
+# environment
+XDG_SESSION_PATH = /org/freedesktop/DisplayManager/Session0
+# environment
+GSETTINGS_SCHEMA_DIR = /snap/code/104/usr/share/glib-2.0/schemas
+# default
+MAKE_HOST := x86_64-pc-linux-gnu
+# environment
+PATH = /opt/ros/kinetic/bin:/home/touchair/bin:/home/touchair/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+# environment
+XDG_SESSION_DESKTOP = ubuntu
+# environment
+UNITY_HAS_3D_SUPPORT = false
+# environment
+CLUTTER_IM_MODULE = xim
+# environment
+GPG_AGENT_INFO = /home/touchair/.gnupg/S.gpg-agent:0:1
+# environment
+SESSION_MANAGER = local/touchair-2020T:@/tmp/.ICE-unix/2954,unix/touchair-2020T:/tmp/.ICE-unix/2954
+# environment
+XDG_RUNTIME_DIR = /run/user/1000
+# environment
+GDK_PIXBUF_MODULE_FILE = /home/touchair/snap/code/common/.cache/gdk-pixbuf-loaders.cache
+# environment
+SNAP = /snap/code/104
+# environment
+ROS_ROOT = /opt/ros/kinetic/share/ros
+# environment
+SNAP_VERSION = 6d9b74a7
+# environment
+XDG_MENU_PREFIX = gnome-
+# environment
+DISABLE_WAYLAND = 1
+# environment
+ELECTRON_RUN_AS_NODE = 1
+# environment
+GDK_PIXBUF_MODULEDIR = /snap/code/104/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
+# default
+.FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
+# environment
+SESSION = ubuntu
+# environment
+CMAKE_PREFIX_PATH = /home/touchair/one_liom/one_liom3/devel:/home/touchair/one_liom/one_liom2/devel:/home/touchair/one_liom/one_liom1/devel:/opt/ros/kinetic
+# environment
+XDG_GREETER_DATA_DIR = /var/lib/lightdm-data/touchair
+# environment
+LS_COLORS = rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:
+# environment
+JOB = unity-settings-daemon
+# environment
+ROS_DISTRO = kinetic
+# environment
+SSH_AUTH_SOCK = /run/user/1000/keyring/ssh
+# environment
+GIO_LAUNCHED_DESKTOP_FILE_PID = 21351
+# automatic
+%F = $(notdir $%)
+# environment
+DISPLAY = :0
+# environment
+GTK_IM_MODULE = fcitx
+# environment
+SNAP_INSTANCE_KEY = 
+# environment
+UE4_ROOT = /home/touchair/UnrealEngine_4.26
+# environment
+PWD = /home/touchair/gnss_ws/src/SLAM多传感器融合建图/Unmanned-car-with-SLAM-and-Navigation/Software/Mapping/测试框架/A-LOAM
+# environment
+QT_QPA_PLATFORMTHEME = appmenu-qt5
+# environment
+XDG_SEAT = seat0
+# environment
+GDM_LANG = zh_CN
+# environment
+PKG_CONFIG_PATH = /home/touchair/one_liom/one_liom3/devel/lib/pkgconfig:/home/touchair/one_liom/one_liom2/devel/lib/pkgconfig:/home/touchair/one_liom/one_liom1/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig:/opt/ros/kinetic/lib/x86_64-linux-gnu/pkgconfig
+# environment
+ORIGINAL_XDG_CURRENT_DESKTOP = Unity
+# environment
+GTK_MODULES = gail:atk-bridge:unity-gtk-module
+# environment
+VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
+# environment
+HOME = /home/touchair
+# environment
+LD_LIBRARY_PATH = /home/touchair/one_liom/one_liom3/devel/lib:/home/touchair/one_liom/one_liom2/devel/lib:/home/touchair/one_liom/one_liom1/devel/lib:/opt/ros/kinetic/lib:/opt/ros/kinetic/lib/x86_64-linux-gnu:/usr/local/lib
+# environment
+LESSCLOSE = /usr/bin/lesspipe %s %s
+# environment
+VSCODE_CLI = 1
+# environment
+VSCODE_CODE_CACHE_PATH = /home/touchair/.config/Code/CachedData/6d9b74a70ca9c7733b29f0456fd8195364076dda
+# environment
+LOGNAME = touchair
+# environment
+QT_LINUX_ACCESSIBILITY_ALWAYS_ON = 1
+# environment
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+# environment
+SNAP_LIBRARY_PATH = /var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd/void
+# environment
+SNAP_CONTEXT = ZAf_yPSj__C3RXqIfLEyI-mQX49wJC_tz2q7cmSo51wONByAwgLc
+# environment
+ELECTRON_NO_ATTACH_CONSOLE = 1
+# environment
+SNAP_USER_COMMON = /home/touchair/snap/code/common
+# environment
+VSCODE_HANDLES_UNCAUGHT_ERRORS = true
+# default
+MAKE_VERSION := 4.1
+# environment
+GNOME_DESKTOP_SESSION_ID = this-is-deprecated
+# automatic
+^D = $(patsubst %/,%,$(dir $^))
+# environment
+XDG_VTNR = 7
+# environment
+MAKELEVEL := 0
+# environment
+SNAP_REAL_HOME = /home/touchair
+# default
+MAKE = $(MAKE_COMMAND)
+# default
+MAKECMDGOALS := all
+# environment
+QT_IM_MODULE = fcitx
+# environment
+SNAP_USER_DATA = /home/touchair/snap/code/104
+# environment
+SHLVL = 1
+# environment
+LGSVL_SIM_DIR_PATH = /home/touchair/lgsvlsimulator-linux64-2020.06
+# environment
+IM_CONFIG_PHASE = 1
+# environment
+COMPIZ_CONFIG_PROFILE = ubuntu
+# environment
+XDG_SESSION_ID = c2
+# environment
+USER = touchair
+# environment
+SNAP_REVISION = 104
+# makefile
+.DEFAULT_GOAL := 
+# environment
+XDG_CURRENT_DESKTOP = Unity
+# environment
+UPSTART_EVENTS = xsession started
+# environment
+CHROME_DESKTOP = code-url-handler.desktop
+# environment
+ROSLISP_PACKAGE_DIRECTORIES = /home/touchair/one_liom/one_liom3/devel/share/common-lisp:/home/touchair/one_liom/one_liom2/devel/share/common-lisp:/home/touchair/one_liom/one_liom1/devel/share/common-lisp
+# automatic
+%D = $(patsubst %/,%,$(dir $%))
+# environment
+GNOME_KEYRING_PID = 
+# default
+MAKE_COMMAND := make
+# default
+.VARIABLES := 
+# automatic
+*F = $(notdir $*)
+# environment
+LANGUAGE = zh_CN:zh
+# environment
+XDG_SEAT_PATH = /org/freedesktop/DisplayManager/Seat0
+# environment
+VSCODE_IPC_HOOK = /run/user/1000/vscode-b50de9cf-1.70.1-main.sock
+# environment
+PYTHONPATH = /opt/ros/kinetic/lib/python2.7/dist-packages
+# environment
+GNOME_KEYRING_CONTROL = 
+# makefile
+MAKEFLAGS = pqrR
+# environment
+MFLAGS = -pqrR
+# automatic
+*D = $(patsubst %/,%,$(dir $*))
+# environment
+ROS_VERSION = 1
+# automatic
++D = $(patsubst %/,%,$(dir $+))
+# environment
+GDK_BACKEND = x11
+# automatic
++F = $(notdir $+)
+# environment
+GTK2_MODULES = overlay-scrollbar
+# environment
+QT_ACCESSIBILITY = 1
+# environment
+COMPIZ_BIN_PATH = /usr/bin/
+# environment
+DEFAULTS_PATH = /usr/share/gconf/ubuntu.default.path
+# environment
+NO_AT_BRIDGE = 1
+# default
+MAKEFILES := 
+# environment
+UPSTART_SESSION = unix:abstract=/com/ubuntu/upstart-session/1000/2715
+# environment
+SNAP_COOKIE = ZAf_yPSj__C3RXqIfLEyI-mQX49wJC_tz2q7cmSo51wONByAwgLc
+# automatic
+<F = $(notdir $<)
+# environment
+CXX = /usr/bin/g++-9
+# environment
+ROS_MASTER_URI = http://touchair-2020T:11311
+# environment
+INSTANCE = 
+# environment
+SNAP_NAME = code
+# environment
+LC_ALL = C
+# environment
+QT4_IM_MODULE = fcitx
+# automatic
+^F = $(notdir $^)
+# default
+SUFFIXES := 
+# environment
+ROS_HOSTNAME = touchair-2020T
+# environment
+SNAP_REEXEC = 
+# environment
+LIBGL_ALWAYS_SOFTWARE = 1
+# default
+ 
+.INCLUDE_DIRS = /usr/include /usr/local/include /usr/include
+# default
+.RECIPEPREFIX := 
+# environment
+TILIX_ID = 6b7bbf6b-31de-491b-8d8c-9660ac8b5177
+# environment
+LANG = C
+# environment
+TERM = xterm-256color
+# environment
+VSCODE_PID = 3815
+# variable set hash-table stats:
+# Load=153/1024=15%, Rehash=0, Collisions=19/175=11%
+
+# Pattern-specific Variable Values
+
+# No pattern-specific variable values.
+
+# Directories
+
+# . (device 2053, inode 3326100): 4 files, no impossibilities.
+
+# 4 files, no impossibilities in 1 directories.
+
+# Implicit Rules
+
+# No implicit rules.
+
+# Files
+
+# Not a target:
+all:
+#  Command line target.
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has not been updated.
+
+# Not a target:
+Makefile:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+
+# Not a target:
+makefile:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+
+# Not a target:
+.DEFAULT:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+# Not a target:
+GNUmakefile:
+#  Implicit rule search has been done.
+#  File does not exist.
+#  File has been updated.
+#  Failed to be updated.
+
+# files hash-table stats:
+# Load=6/1024=1%, Rehash=0, Collisions=0/15=0%
+# VPATH Search Paths
+
+# No 'vpath' search paths.
+
+# No general ('VPATH' variable) search path.
+
+# strcache buffers: 1 (0) / strings = 12 / storage = 102 B / avg = 8 B
+# current buf: size = 8162 B / used = 102 B / count = 12 / avg = 8 B
+
+# strcache performance: lookups = 15 / hit rate = 20%
+# hash-table stats:
+# Load=12/8192=0%, Rehash=0, Collisions=1/15=7%
+# Finished Make data base on Thu Aug 11 18:24:36 2022
+
+ 

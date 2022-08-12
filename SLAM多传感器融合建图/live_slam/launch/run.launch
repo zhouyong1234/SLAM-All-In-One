@@ -1,0 +1,20 @@
+<launch>
+
+    <arg name="project" default="live_slam"/>
+    
+    <!-- Parameters -->
+    <rosparam file="$(find live_slam)/config/params.yaml" command="load" />
+
+    <!--- SLAM -->
+    <include file="$(find live_slam)/launch/include/module_loam.launch" />
+
+    <!--- Robot State TF -->
+    <include file="$(find live_slam)/launch/include/module_robot_state_publisher.launch" />
+
+    <!--- Run Navsat -->
+    <include file="$(find live_slam)/launch/include/module_navsat.launch" />
+
+    <!--- Run Rviz-->
+    <include file="$(find live_slam)/launch/include/module_rviz.launch" />
+
+</launch>

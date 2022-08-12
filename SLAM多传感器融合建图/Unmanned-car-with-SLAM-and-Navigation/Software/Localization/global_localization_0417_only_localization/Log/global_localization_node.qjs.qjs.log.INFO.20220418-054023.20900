@@ -1,0 +1,9 @@
+Log file created at: 2022/04/18 05:40:23
+Running on machine: qjs
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0418 05:40:23.677644 20900 matching.cpp:53] 
+-----------------Init Localization-------------------
+I0418 05:40:23.729959 20900 matching.cpp:79] Load global map, size:1649309
+I0418 05:40:23.859445 20900 matching.cpp:83] Filtered global map, size:1649309
+I0418 05:40:23.958549 20900 matching.cpp:101] New local map:-150,150,-150,150,-150,150
+

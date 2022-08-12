@@ -1,0 +1,6 @@
+<launch>
+     <include file="$(find mapping)/launch/demo_mapping.launch" />
+    <!-- 运行move_base节点 -->
+    <include file="$(find robot_sim)/launch/path_planning.launch" />
+    <!-- 运行rviz -->
+</launch>

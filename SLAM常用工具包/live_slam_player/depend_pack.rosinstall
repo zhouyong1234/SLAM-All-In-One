@@ -1,0 +1,4 @@
+- git:
+   local-name: irp_sen_msgs
+   uri: https://github.com/irapkaist/irp_sen_msgs.git
+

@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.tex": "cpp",
+        "cmath": "cpp",
+        "*.tcc": "cpp",
+        "complex": "cpp",
+        "random": "cpp",
+        "matrixfunctions": "cpp"
+    }
+}

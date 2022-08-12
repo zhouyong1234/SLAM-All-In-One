@@ -1,0 +1,72 @@
+%YAML:1.0
+
+encoder_topic: "/encoder_info"
+imu_topic: "/imu_info"
+gps_topic: "/gps_info"
+image_topic: "/img_info"
+
+#camera calibration 
+model_type: PINHOLE
+camera_name: camera
+image_width: 1280
+image_height: 560
+distortion_parameters:
+   k1: -5.6143027800000002e-02
+   k2: 1.3952563200000001e-01
+   p1: -1.2155906999999999e-03
+   p2: -9.7281389999999998e-04
+projection_parameters:
+   fx: 8.1690378992770002e+02
+   fy: 8.1156803828490001e+02
+   cx: 6.0850726281690004e+02
+   cy: 2.6347599764440002e+02
+
+#feature traker paprameters
+max_cnt: 300            # max feature number in feature tracking
+min_dist: 30            # min distance between two features 
+freq: 10                # frequence (Hz) of publish tracking result. At least 10Hz for good estimation. If set 0, the frequence will be same as raw image 
+F_threshold: 1.0        # ransac threshold (pixel)
+show_track: 1           # publish tracking image as topic
+equalize: 1             # if image is too dark or light, trun on equalize to find enough features
+fisheye: 0              # if using fisheye, trun on it. A circle mask will be loaded to remove edge noisy points
+
+Extrinsic.R_o_c: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ -0.00680499, -0.0153215, 0.99985, 
+           -0.999977, 0.000334627, -0.00680066,
+           -0.000230383, -0.999883, -0.0153234 ]
+Extrinsic.t_o_c: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [ 1.64239, 0.247401, 1.58411 ]
+Extrinsic.t_o_g: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [ -0.32, 0, 1.7 ]
+Extrinsic.R_o_i: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ 1, 0, 0, 
+           0, 1, 0,
+           0, 0, 1 ]
+Extrinsic.t_o_i: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [ -0.07, 0, 1.7 ]
+
+# IMU parameters
+acc_noise: 1.0e-02
+acc_bias_noise: 1.0e-06
+gyro_noise: 1.0e-04
+gyro_bias_noise: 1.0e-08
+
+# encoder parameters
+left_wheel_diameter: 0.623479
+right_wheel_diameter: 0.622806
+wheel_base: 1.52439

@@ -1,0 +1,13 @@
+float64 timeStamp
+float64 latitude
+float64 longitude
+float64 altitude
+float64 cov00
+float64 cov01
+float64 cov02
+float64 cov10
+float64 cov11
+float64 cov12
+float64 cov20
+float64 cov21
+float64 cov22

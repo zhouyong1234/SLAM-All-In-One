@@ -1,0 +1,292 @@
+# Configuration file for SBG device through an Uart interface.
+
+driver:
+  # Node frequency (Hz)
+  # Note: The frequency should be at least two times higher than the highest
+  #       output frequency.
+  #       The frequency can be reduced in order to reduce CPU consumption but
+  #       it can lead to miss data frame and less accurate time stamping.
+  frequency: 400
+
+# Configuration of the device with ROS.
+confWithRos: false
+
+# Uart configuration
+uartConf:
+  # Port Name
+  portName: "/dev/ttyUSB0"
+
+  # Baude rate (4800 ,9600 ,19200 ,38400 ,115200 [default],230400 ,460800 ,921600)
+  baudRate: 115200
+
+  # Port Id
+  # 0 PORT_A: Main communication interface. Full duplex.
+  # 1 PORT_B: Auxiliary input interface for RTCM
+  # 2 PORT_C: Auxiliary communication interface. Full duplex.
+  # 3 PORT_D: Auxiliary input interface
+  # 4 PORT_E: Auxiliary input/output interface
+  portID: 0
+
+# Sensor Parameters
+sensorParameters:
+  # Initial latitude (°)
+  initLat: 48.419727
+  # Initial longitude (°)
+  initLong: -4.472119
+  # Initial altitude (above WGS84 ellipsoid) (m)
+  initAlt: 100.0
+  # Year at startup
+  year: 2018
+  # month in year at startup
+  month: 03
+  # day in month at startup
+  day: 10
+
+  # Montion profile ID
+  # 1 GENERAL_PURPOSE Should be used as a default when other profiles do not apply
+  # 2 AUTOMOTIVE      Dedicated to car applications
+  # 3 MARINE          Used in marine and underwater applications
+  # 4 AIRPLANE        For fixed wings aircraft
+  # 5 HELICOPTER      For rotary wing aircraft
+  motionProfile: 1
+
+# IMU_ALIGNMENT_LEVER_ARM
+imuAlignementLeverArm:
+  # IMU X axis direction in vehicle frame
+  # 0 ALIGNMENT_FORWARD   IMU Axis is turned in vehicle's forward direction
+  # 1 ALIGNMENT_BACKWARD  IMU Axis is turned in vehicle's backward direction
+  # 2 ALIGNMENT_LEFT      IMU Axis is turned in vehicle's left direction
+  # 3 ALIGNMENT_RIGHT     IMU Axis is turned in vehicle's right direction
+  # 4 ALIGNMENT_UP        IMU Axis is turned in vehicle's up direction
+  # 5 ALIGNMENT_DOWN      IMU Axis is turned in vehicle's down direction
+  axisDirectionX: 0
+  # IMU Y axis direction in vehicle frame
+  # 0 ALIGNMENT_FORWARD   IMU Axis is turned in vehicle's forward direction
+  # 1 ALIGNMENT_BACKWARD  IMU Axis is turned in vehicle's backward direction
+  # 2 ALIGNMENT_LEFT      IMU Axis is turned in vehicle's left direction
+  # 3 ALIGNMENT_RIGHT     IMU Axis is turned in vehicle's right direction
+  # 4 ALIGNMENT_UP        IMU Axis is turned in vehicle's up direction
+  # 5 ALIGNMENT_DOWN      IMU Axis is turned in vehicle's down direction
+  axisDirectionY: 3
+  # Residual roll error after axis alignment rad
+  misRoll: 0
+  # Residual pitch error after axis alignment rad
+  misPitch: 0
+  # Residual yaw error after axis alignment rad
+  misYaw: 0
+  # X Primary lever arm in IMU X axis (once IMU alignment is applied) m
+  leverArmX: 0
+  # Y Primary lever arm in IMU Y axis (once IMU alignment is applied) m
+  leverArmY: 0
+  # Z Primary lever arm in IMU Z axis (once IMU alignment is applied) m
+  leverArmZ: 0
+
+# AIDING_ASSIGNMENT
+# Note: GNSS1 module configuration can only be set to an external port on Ellipse-E version.
+# Ellipse-N users must set this module to MODULE_INTERNAL. On the other hand, rtcmModule is only
+# available for Ellipse-N users. This module must be set to MODULE_DISABLED for other users.
+aidingAssignment:
+  # GNSS module port assignment:
+  # 255 Module is disabled
+  # 1 Module connected on PORT_B
+  # 2 Module connected on PORT_C
+  # 3 Module connected on PORT_D
+  # 5 Module is connected internally
+  gnss1ModulePortAssignment: 255
+  # GNSS module sync assignment:
+  # 0 Module is disabled
+  # 1 Synchronization is done using SYNC_IN_A pin
+  # 2 Synchronization is done using SYNC_IN_B pin
+  # 3 Synchronization is done using SYNC_IN_C pin
+  # 4 Synchronization is done using SYNC_IN_D pin
+  # 5 Synchronization is internal
+  # 6 Synchronization is done using SYNC_OUT_A pin
+  # 7 Synchronization is done using SYNC_OUT_B pin
+  gnss1ModuleSyncAssignment: 0
+  # RTCM input port assignment for Ellipse-N DGPS (see gnss1ModulePortAssignment for values)
+  rtcmPortAssignment: 255
+  # Odometer module pin assignment
+  # 0 Odometer is disabled
+  # 1 Odometer connected only to ODO_A (unidirectional).
+  # 2 Odometer connected to both ODO_A (signal A) and ODO_B (Signal B or direction) for bidirectional odometer.
+  odometerPinAssignment: 0
+
+magnetometer:
+  # Magnetometer model ID
+  # 201 Should be used in most applications
+  # 202 Should be used in disturbed magnetic environment
+  magnetometerModel: 201
+  # Magnetometer rejection mode
+  # 0 Measurement is not taken into account
+  # 1 Measurement is rejected if inconsistent with current estimate (depending on error model)
+  # 2 Measurement is always accepted
+  magnetometerRejectMode: 1
+
+  # Theses parameters are only used for a calibration run
+  calibration:
+    # 1 2D Tell the device that the magnetic calibration will be performed with limited motions. 
+    #     This calibration mode is only designed to be used when roll and pitch motions are less than ± 5°. 
+    #     To work correctly, the device should be rotated through at least a full circle.
+    # 2 3D Tell the device to start a full 3D magnetic calibration procedure. The 3D magnetic calibration offers the best accuracy
+    mode: 2
+
+    # 0 LOW_BW Use this parameter in case of strong magnetic noise during calibration. 
+    #     Motion during calibration is then limited to slow rotations.
+    # 1 MEDIUM_BW Tell the device that medium dynamics will be observed during the magnetic calibration process. 
+    #     It can be used in case of medium magnetic noise during calibration process. Medium dynamics are used during calibration.
+    # 2 HIGH_BW This parameter is suitable to most applications. It can be used when the dynamics during calibration are relatively high.
+    bandwidth: 2
+
+
+# GNSS configuration
+# Note: Secondary level arms should only be considered in case of dual antenna GNSS receiver. It can be left to 0 otherwise.
+gnss:
+  # Gnss Model Id
+  # 101 Used on Ellipse-N to setup the internal GNSS in GPS+GLONASS
+  # 102 Default mode for Ellipse-E connection to external GNSS
+  # 103 Used on Ellipse-N to setup the internal GNSS in GPS+BEIDOU
+  # 104 Used on Ellipse-E to setup a connection to ublox in read only mode.
+  # 106 Used on Ellipse-E to setup a connection to Novatel receiver in read only mode.
+  # 107 Used on Ellipse-D by default
+  gnss_model_id: 101
+
+  #GNSS primary antenna lever arm in IMU X axis (m)
+  primaryLeverArmX: 0
+  #GNSS primary antenna lever arm in IMU Y axis (m)
+  primaryLeverArmY: 0
+  #GNSS primary antenna lever arm in IMU Z axis (m)
+  primaryLeverArmZ: 0
+  #GNSS primary antenna precise. Set to true if the primary lever arm has been accurately entered and doesn't need online re-estimation.
+  primaryLeverPrecise: true
+
+  #GNSS secondary antenna lever arm in IMU X axis (m)
+  secondaryLeverArmX: 0
+  #GNSS secondary antenna lever arm in IMU Y axis (m)
+  secondaryLeverArmY: 0
+  #GNSS secondary antenna lever arm in IMU Z axis (m)
+  secondaryLeverArmZ: 0
+
+  # Secondary antenna operating mode.
+  # 1 The GNSS will be used in single antenna mode only and the secondary lever arm is not used.
+  # 2 [Reserved] The GNSS dual antenna information will be used but the secondary lever arm is not known.
+  # 3 The GNSS dual antenna information will be used and we have a rough guess for the secondary lever arm.
+  # 4 The GNSS dual antenna information will be used and the secondary lever arm is accurately entered and doesn't need online re-estimation.
+  secondaryLeverMode: 1
+
+  # Rejection mode for position
+  # 0 Measurement is not taken into account
+  # 1 Measurement is rejected if inconsistent with current estimate (depending on error model)
+  # 2 Measurement is always accepted
+  posRejectMode: 1
+  # Rejection mode for velocity (see posRejectMode values)
+  velRejectMode: 1
+  # Rejection mode for true heading (see posRejectMode values)
+  hdtRejectMode: 1
+
+# Odometer configuration
+odom:
+  # Odometer's gain Pulses/m
+  gain: 4800 
+  # User gain average error (%)
+  gain_error: 0.1 
+  # Odometer's direction
+  # 0: positive
+  # 1: negative
+  direction: 0
+
+  # Odometer lever arm in IMU X axis (m)
+  leverArmX: 0
+  # Odometer lever arm in IMU Y axis (m)
+  leverArmY: 0
+  # Odometer lever arm in IMU Z axis (m)
+  leverArmZ: 0
+
+  # Odometer rejection mode
+  # 0 Measurement is not taken into account
+  # 1 Measurement is rejected if inconsistent with current estimate (depending on error model)
+  # 2 Measurement is always accepted
+  rejectMode: 1
+
+# ToDo: event & CAN configuration
+
+############################### Output configuration ###############################
+# 0 Output is disabled
+# 1 Output is generated at 200Hz
+# 2 Output is generated at 100Hz
+# 4 Output is generated at 50Hz
+# 8 Output is generated at 25Hz
+# 10 Output is generated at 20Hz
+# 20 Output is generated at 10Hz
+# 40 Output is generated at 5Hz
+# 200 Output is generated at 1Hz
+# 10000 Pulse Per Second. Same mode as above.
+# 10001 Output sent when a new data is available.
+# 10002 Output is generated when a new virtual odometer event occurs
+# 10003 Output is generated on a Sync In A event
+# 10004 Output is generated on a Sync In B event
+# 10005 Output is generated on a Sync In C event
+# 10006 Output is generated on a Sync In D event
+output:
+  # Time reference:
+  # Note: Set the time reference used to timestamp the header of the published
+  #       messages.
+  #       The header of the ROS standard message sensor_msgs:TimeReference is
+  #       not effected by this parameter and it will be timestamped by the ROS time.
+  #
+  # "ros" : ROS time (default)
+  # "ins_unix" : INS absolute time referenced to UNIX epoch (00:00:00 UTC on 1 January 1970)
+  time_reference: "ros"
+
+  # Ros standard output:
+  # Note: If true publish ROS standard messages.
+  ros_standard: false
+
+  # Frame convention:
+  # Note: If true messages are expressed in the ENU convention.
+  #
+  # true : ENU convention (X east, Y north, Z up)
+  # false (default): NED convention (X north, Y east, Z down)
+  use_enu: false
+
+  # Frame ID:
+  # Note: If the frame convention is NED so the default frame ID is (imu_link_ned)
+  #       else if the convention is ENU so the default frame ID is (imu_link)
+  frame_id: "imu_link_ned"
+
+  # Status general, clock, com aiding, solution, heave
+  log_status: 200
+  # Includes IMU status, acc., gyro, temp delta speeds and delta angles values
+  log_imu_data: 8
+  # Includes roll, pitch, yaw and their accuracies on each axis
+  log_ekf_euler: 0
+  # Includes the 4 quaternions values
+  log_ekf_quat: 8
+  # Position and velocities in NED coordinates with the accuracies on each axis
+  log_ekf_nav: 0
+  # Heave, surge and sway and accelerations on each axis for up to 4 points
+  log_ship_motion: 0
+  # Provides UTC time reference
+  log_utc_time: 200
+  # Magnetic data with associated accelerometer on each axis
+  log_mag: 0
+  # Magnetometer calibration data (raw buffer)
+  log_mag_calib: 0
+  # GPS velocities from primary or secondary GPS receiver
+  log_gps1_vel: 0
+  # GPS positions from primary or secondary GPS receiver
+  log_gps1_pos: 0
+  # GPS true heading from dual antenna system
+  log_gps1_hdt: 0
+  # GPS 1 raw data for post processing.
+  log_gps1_raw: 0
+  # Provides odometer velocity
+  log_odo_vel: 0
+  # Event A/B/C/D Event markers sent when events are detected on a sync in pin
+  log_event_a: 0
+  log_event_b: 0
+  log_event_c: 0
+  log_event_d: 0
+  # Air data
+  log_air_data: 0
+  # Short IMU data
+  log_imu_short: 8

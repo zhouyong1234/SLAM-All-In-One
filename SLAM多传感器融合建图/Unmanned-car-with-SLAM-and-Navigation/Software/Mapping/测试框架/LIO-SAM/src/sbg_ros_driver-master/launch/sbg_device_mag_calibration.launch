@@ -1,0 +1,5 @@
+<launch>
+  <node name="sbg_device_mag" pkg="sbg_driver" type="sbg_device_mag" output="screen">
+  	<rosparam command="load" file="$(find sbg_driver)/config/example/ellipse_E_default.yaml" />
+  </node>
+</launch>

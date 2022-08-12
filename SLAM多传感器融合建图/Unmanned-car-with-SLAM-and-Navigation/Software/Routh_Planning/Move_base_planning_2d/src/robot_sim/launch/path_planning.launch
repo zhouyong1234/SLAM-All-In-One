@@ -1,0 +1,14 @@
+<launch>
+
+  <!-- <include file="$(find mapping)/launch/demo_mapping.launch" />
+  <include file="$(find scout_bringup)/launch/scout_mini_robot_base.launch" /> -->
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+        <rosparam file="$(find robot_sim)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find robot_sim)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find robot_sim)/config/local_costmap_params.yaml" command="load" />
+        <rosparam file="$(find robot_sim)/config/global_costmap_params.yaml" command="load" />
+        <rosparam file="$(find robot_sim)/config/base_local_planner_params.yaml" command="load" />
+    </node>
+
+</launch>

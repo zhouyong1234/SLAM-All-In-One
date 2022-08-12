@@ -1,0 +1,48 @@
+<!-- 
+Example launch file: launches the scan matcher with pre-recorded data, 
+together with an alpha-beta filter.
+-->
+
+<launch>
+
+  #### set up data playback from bag #############################
+
+  <param name="/use_sim_time" value="true"/>
+
+  <node pkg="rviz" type="rviz" name="rviz" 
+    args="-d $(find laser_scan_matcher)/demo/demo.vcg"/>
+
+  <node pkg="rosbag" type="play" name="play" 
+    args="$(find laser_scan_matcher)/demo/demo.bag --delay=5 --clock"/>
+
+  #### publish an example base_link -> laser transform ###########
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" 
+    args="0.0 0.0 0.0 0.0 0.0 0.0 /base_link /laser 40" />
+
+  #### start the laser scan_matcher ##############################
+
+  <node pkg="laser_scan_matcher" type="laser_scan_matcher_node" 
+    name="laser_scan_matcher_node" output="screen">
+
+    <param name="use_vel"        value="true"/>
+    <param name="max_iterations" value="10"/>
+
+  </node>
+
+  #### start the alpha-beta filter ###############################
+
+  <node pkg="ab_filter" type="ab_filter_pose2d_node" 
+    name="ab_filter_pose2d" output="screen">
+
+    <remap from="mav/pose2D"      to="pose_2D"/>
+    <remap from="mav/pose2D_f"    to="pose2D_f"/>
+    <remap from="mav/pose2D_unf"  to="pose2D_unf"/>
+
+    <param name="alpha" value="1.0"/>
+    <param name="beta"  value="0.5"/>
+    <param name="publish_unfiltered"  value="true"/>
+
+  </node>
+
+</launch>

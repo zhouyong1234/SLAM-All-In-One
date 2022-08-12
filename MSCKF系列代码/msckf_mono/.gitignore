@@ -1,0 +1,11 @@
+Proj/
+build/
+devel/
+img/
+bin/
+datasets/
+rovio/
+msckf_test2/
+msckf_test3/
+msckf_origin/
+msckf/

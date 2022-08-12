@@ -1,0 +1,9 @@
+<!-- Laser scan sparsifier nodelet publisher -->
+<library path="lib/liblaser_scan_sparsifier_nodelet">
+  <class name="laser_scan_sparsifier/LaserScanSparsifierNodelet" type="LaserScanSparsifierNodelet" 
+    base_class_type="nodelet::Nodelet">
+    <description>
+      Laser scan sparsifier nodelet publisher.
+    </description>
+  </class>
+</library>

@@ -1,0 +1,7 @@
+/home/touchair/gnss_ws/src/TinyGrapeKit/library/build/CMakeFiles/install/strip.dir
+/home/touchair/gnss_ws/src/TinyGrapeKit/library/build/CMakeFiles/install/local.dir
+/home/touchair/gnss_ws/src/TinyGrapeKit/library/build/CMakeFiles/edit_cache.dir
+/home/touchair/gnss_ws/src/TinyGrapeKit/library/build/CMakeFiles/rebuild_cache.dir
+/home/touchair/gnss_ws/src/TinyGrapeKit/library/build/CMakeFiles/TinyGrapeKit.dir
+/home/touchair/gnss_ws/src/TinyGrapeKit/library/build/CMakeFiles/list_install_components.dir
+/home/touchair/gnss_ws/src/TinyGrapeKit/library/build/CMakeFiles/install.dir

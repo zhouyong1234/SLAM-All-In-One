@@ -1,0 +1,5 @@
+<launch>
+  <node name="sbg_device" pkg="sbg_driver" type="sbg_device" output="screen">
+  	<rosparam command="load" file="$(find sbg_driver)/config/sbg_device_uart_default.yaml" />
+  </node>
+</launch>

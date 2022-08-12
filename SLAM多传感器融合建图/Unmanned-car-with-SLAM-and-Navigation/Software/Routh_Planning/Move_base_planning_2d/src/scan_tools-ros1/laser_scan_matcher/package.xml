@@ -1,0 +1,48 @@
+<package>
+  <name>laser_scan_matcher</name>
+  <version>0.3.3</version>
+  <description>
+    <p>
+     An incremental laser scan matcher, using Andrea Censi's Canonical Scan Matcher (CSM) implementation. See <a href="http://censi.mit.edu/software/csm/">the web site</a> for more about CSM. NOTE the CSM library is licensed under the GNU Lesser General Public License v3, whereas the rest of the code is released under the BSD license.
+    </p>
+  </description>
+  <maintainer email="cjaramillo@gc.cuny.edu">Carlos</maintainer>
+  <maintainer email="130s@2000.jukuin.keio.ac.jp">Isaac I.Y. Saito</maintainer>
+
+  <url>http://wiki.ros.org/laser_scan_matcher</url>
+  <author email="ccnyroboticslab@gmail.com">Ivan Dryanovski</author>
+  <author>William Morris</author>
+  <author>Andrea Censi</author>
+
+  <license>BSD</license>
+  <license>LGPLv3</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>csm</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>libpcl-all-dev</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>nodelet</build_depend>
+  <build_depend>pcl_conversions</build_depend>
+  <build_depend>pcl_ros</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>tf</build_depend>
+
+  <run_depend>csm</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>libpcl-all</run_depend>
+  <run_depend>nav_msgs</run_depend>
+  <run_depend>nodelet</run_depend>
+  <run_depend>pcl_ros</run_depend>
+  <run_depend>pcl_conversions</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>tf</run_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/laser_scan_matcher_nodelet.xml" />
+  </export>
+
+</package>

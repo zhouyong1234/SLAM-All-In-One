@@ -1,0 +1,35 @@
+dataset: "/home/touchair/kaist_urban_dataset/urban08"
+save_to: "/home/touchair/kaist_urban_dataset/urban08/bag"
+
+altimeter: true
+altimeter_topic: "/altimeter_data"
+
+encoder: true
+encoder_irp_topic: "/encoder_count"
+encoder_raw_topic: "/joint_states"
+
+fog: false
+fog_topic: "/dsp1760_data"
+
+gps: false
+gps_topic: "/gps/fix"
+
+vrs: true
+vrs_topic: "/vrs_gps_data"
+
+imu: true
+# imu_irp_topic: "/xsens_imu_data"
+imu_raw_topic: "/imu/data_raw"
+# imu_mag_topic: "/imu/mag"
+
+velodyne: true
+velodyne_left_topic: "/ns2/velodyne_points"
+velodyne_right_topic: "/ns1/velodyne_points"
+
+sick: false
+sick_back_topic: "/lms511_back/scan"
+sick_middle_topic: "/lms511_middle/scan"
+
+stereo: false
+stereo_left_topic: "/stereo/left/image_raw"
+stereo_right_topic: "/stereo/right/image_raw"

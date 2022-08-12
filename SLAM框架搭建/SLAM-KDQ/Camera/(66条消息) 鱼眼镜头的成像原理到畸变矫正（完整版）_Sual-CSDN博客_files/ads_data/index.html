@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><script src="index_data/exitapi-impl.js" type="text/javascript"></script><script src="index_data/addata.js" type="text/javascript"></script><meta charset="UTF-8"><title></title><meta content="width=device-width" name="viewport"><meta content="width=300,height=600" name="ad.size"><script src="index_data/easeljs-0.js"></script><script src="index_data/tweenjs-0.js"></script><script src="index_data/movieclip-0.js"></script><script src="index_data/preloadjs-0.js"></script><script src="index_data/script.js"></script><style type="text/css">
+body {
+	margin-left: 0px;
+	margin-top: 0px;
+	margin-right: 0px;
+	margin-bottom: 0px;
+}
+.border{
+	width: 298px;
+    height: 598px;
+	border: 1px solid #9C1930;
+	position:absolute;
+	z-index:150;
+	left:0;
+	top:0;
+}
+</style><script type="text/javascript" src="index_data/LnuN3C34rR70L3hG8w6Spma0p50xn6UkBXRbbJn0q6o.js"></script></head><body onclick="ExitApi.exit();" style="background-color:#D4D4D4; cursor:pointer">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="position:absolute; margin-left:-6000px;">
+<img src="index_data/bg.jpg">
+<img src="index_data/icon1.png">
+<img src="index_data/icon2.png">
+<img src="index_data/icon3.png">
+<img src="index_data/icon5.png">
+<img src="index_data/icon6.png">
+<img src="index_data/icon7.png">
+</div>
+	<canvas id="canvas" style="background-color:#FFFFFF" width="300" height="600"></canvas>
+    <div class="border"></div>
+    
+<script>
+var canvas, stage, exportRoot;
+function init() {
+	canvas = document.getElementById("canvas");
+	
+	exportRoot = new lib._300x600();
+
+	stage = new createjs.Stage(canvas);
+	stage.addChild(exportRoot);
+	stage.update();
+
+	createjs.Ticker.setFPS(lib.properties.fps);
+	createjs.Ticker.addEventListener("tick", stage);
+}
+init();
+
+</script>
+
+
+</body></html>

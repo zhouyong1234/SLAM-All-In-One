@@ -1,0 +1,10 @@
+*~
+.DS_Store
+
+# IDEs
+.idea
+CMakeLists.txt.user
+
+# Project
+*build
+documentation

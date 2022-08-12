@@ -1,0 +1,10 @@
+rosrun ORB_SLAM3_ROS Monopub /home/touchair/orb_ws/src/ORB_SLAM3_GRID_MAP/ORB_SLAM3_LIB/Vocabulary/ORBvoc.txt  /home/touchair/orb_ws/src/ORB_SLAM3_GRID_MAP/settings/mate30.yaml -1 /cv/ipcam/image_raw
+
+rosrun ORB_SLAM3_ROS Monosub 10 1 29 -25 48 -12 0.55 0.50 1 5 1 0 1 75 350
+rosrun ORB_SLAM3_ROS Monosub 30 5 2  -2  2  -2  0.55 0.50 1 5
+
+rviz
+
+
+
+

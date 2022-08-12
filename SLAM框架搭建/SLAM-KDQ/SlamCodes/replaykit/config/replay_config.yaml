@@ -1,0 +1,10 @@
+%YAML:1.0
+
+#common parameters
+imu_topic: "/imu0"
+image_topic: "/cam0/image_raw"
+replay_folder: "/home/kdq/Workspace/ZeroZero/Log/test/20201120/svo_t2/rovio.replay"
+output_path: "/home/kdq/Workspace/ZeroZero/Log/test/20201120/svo_t2"
+skip_time: 30.0
+write_bag: 0
+speed_k: 5.0

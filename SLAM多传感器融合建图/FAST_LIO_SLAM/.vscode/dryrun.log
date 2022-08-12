@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/touchair/sensor_fusion_ws/src/FAST_LIO_SLAM'
+make: Leaving directory '/home/touchair/sensor_fusion_ws/src/FAST_LIO_SLAM'
+ 
+make: *** No targets specified and no makefile found.  Stop.
+

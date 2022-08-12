@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>one_liom</name>
+  <version>0.0.0</version>
+  <description>The one_liom package</description>
+  <maintainer email="eminbogen@163.com">hcx</maintainer>
+  <license>TODO</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>boost</build_depend>
+  <build_depend>GTSAM</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>turtlesim</build_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <build_export_depend>nav_msgs</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>turtlesim</build_export_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>turtlesim</exec_depend>
+  <exec_depend>GTSAM</exec_depend>
+  <build_depend>message_generation</build_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <export>
+  </export>
+</package>

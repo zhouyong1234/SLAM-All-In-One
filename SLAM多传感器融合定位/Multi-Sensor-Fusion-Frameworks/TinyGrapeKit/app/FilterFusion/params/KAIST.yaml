@@ -1,0 +1,90 @@
+%YAML:1.0
+
+# Camera intrinsic
+Camera.fx: 8.1690378992770002e+02
+Camera.fy: 8.1156803828490001e+02
+camera.s:  0
+Camera.cx: 6.0850726281690004e+02
+Camera.cy: 2.6347599764440002e+02
+
+Camera.k1: -5.6143027800000002e-02
+Camera.k2: 1.3952563200000001e-01
+Camera.p1: -1.2155906999999999e-03
+Camera.p2: -9.7281389999999998e-04
+Camera.k3: 0.
+
+Camera.width: 1280
+Camera.height: 560
+
+# Wheel intrinsic
+Wheel.kl: 0.00047820240382508
+Wheel.kr: 0.00047768621928995
+Wheel.b: 1.52439
+Wheel.noise_factor: 0.2
+
+# Extrinsic
+Extrinsic.O_R_C: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ -0.00680499, -0.0153215, 0.99985, 
+           -0.999977, 0.000334627, -0.00680066,
+           -0.000230383, -0.999883, -0.0153234 ]
+
+Extrinsic.O_p_C: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [ 1.64239, 0.247401, 1.58411 ]
+
+Extrinsic.C_p_Gps: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [ 0.247401, -0.20, -1.96 ]
+
+# Visualization
+viz_config.cam_size: 1.5
+viz_config.cam_line_width: 3.
+viz_config.point_size: 2.
+viz_config.wheel_frame_size: 2.
+viz_config.view_point_x: 0.
+viz_config.view_point_y: 0.
+viz_config.view_point_z: 200.
+viz_config.view_point_f: 500.
+
+viz_config.img_height: 140
+viz_config.img_width: 320
+
+viz_config.max_traj_length: 100000
+viz_config.max_num_features: 1000
+
+viz_config.max_gps_length: 10000
+viz_config.gps_point_size: 5.
+viz_config.show_raw_odom: 0
+viz_config.show_gps_points: 1
+
+# Triangulator
+tri_config.max_proj_res: 5.
+tri_config.min_dist: 0.1
+tri_config.max_dist: 50.
+
+# FeatureTracker
+tracker_config.max_num_corners: 200
+tracker_config.quality_level: 0.01
+tracker_config.min_dist: 40
+
+# Updater
+visual_updater.visual_noise: 0.25
+visual_updater.min_window_length: 1.
+visual_updater.min_cam_dist_to_triangulate: 0.3
+visual_updater.min_res_size: 4
+
+plane_updater.plane_rot_noise: 1e-6
+plane_updater.plane_trans_noise: 0.01
+
+# System config.
+sys_config.sliding_window_size: 10
+sys_config.compute_raw_odom: 1
+sys_config.enable_plane_update: 1
+sys_config.enable_gps_update: 1

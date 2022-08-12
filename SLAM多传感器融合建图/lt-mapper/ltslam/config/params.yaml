@@ -1,0 +1,18 @@
+ltslam:
+
+  sessions_dir: "/home/touchair/output/liom/" # end with / 
+
+  central_sess_name: "011" # should be same as the directory name of that session
+  query_sess_name: "02" # should be same as the directory name of that session
+  
+  save_directory: "/home/touchair/output/log/" # end with "/"
+
+  is_display_debug_msgs: false
+
+  loopFitnessScoreThreshold: 0.7
+
+  kNumSCLoopsUpperBound: 1000 # if you use an enough number, use all the detected loops 
+  kNumRSLoopsUpperBound: 0 # if you use an enough number, use all the detected loops 
+
+  numberOfCores: 16 # currently hard-coded in the utility.cpp
+

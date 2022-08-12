@@ -1,0 +1,130 @@
+image: vladyslavusenko/b_image_focal:latest
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  BUILD_TYPE: Release
+
+# template for docker builds with ccache
+.prepare_docker_template: &prepare_docker_definition
+  tags:
+    - docker
+  before_script:
+    - mkdir -p ccache
+    - export CCACHE_BASEDIR=${PWD}
+    - export CCACHE_DIR=${PWD}/ccache
+    - ccache -s
+  cache:
+    paths:
+    - ccache/
+    key: ${CI_JOB_NAME}
+
+# template for secondary build & unit test configurations
+.compile_and_test_template: &compile_and_test_definition
+  stage: build
+  script:
+    - mkdir build
+    - cd build
+    - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+    - make -j4
+    - ctest
+
+# main build with benchmark and coverage
+focal-release-compile:
+  <<: *prepare_docker_definition
+  stage: build
+  script:
+    - mkdir build
+    - cd build
+    - cmake .. -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+    - make -j4
+    - ctest
+    - ./test/benchmark_camera > ../benchmark_camera.txt
+    - cd ../
+    - mkdir build_coverage
+    - cd build_coverage
+    - cmake .. -DCMAKE_BUILD_TYPE=Coverage
+    - make -j4
+    - ctest
+    - lcov --directory . --capture --output-file coverage.info
+    - lcov --remove coverage.info '*test/*' '/usr/*' '*thirdparty*' '*googletest*' --output-file coverage.info
+    - lcov --list coverage.info
+  artifacts:
+    paths:
+    - benchmark_camera.txt
+
+focal-debug-compile:
+  <<: *prepare_docker_definition
+  <<: *compile_and_test_definition
+  variables:
+    BUILD_TYPE: Debug
+
+focal-relwithdebinfo-compile:
+  <<: *prepare_docker_definition
+  <<: *compile_and_test_definition
+  variables:
+    BUILD_TYPE: RelWithDebInfo
+
+focal-asan-build:
+  <<: *prepare_docker_definition
+  <<: *compile_and_test_definition
+  variables:
+    CC: clang-11
+    CXX: clang++-11
+    BUILD_TYPE: SanitizerRelWithDebInfo
+    # LeakSanitizer doesn't work in (non-priviliged) container
+    ASAN_OPTIONS: "detect_leaks=0"
+
+xenial-release-compile:
+  <<: *prepare_docker_definition
+  <<: *compile_and_test_definition
+  image: vladyslavusenko/b_image_xenial:latest
+
+bionic-release-compile:
+  <<: *prepare_docker_definition
+  <<: *compile_and_test_definition
+  image: vladyslavusenko/b_image_bionic:latest
+
+mojave-relwithdebinfo-compile:
+  <<: *compile_and_test_definition
+  tags: [macos, "10.14"]
+  variables:
+    BUILD_TYPE: RelWithDebInfo
+
+#mojave-brewedclang-asan-build:
+#  <<: *compile_and_test_definition
+#  tags: [macos, "10.14"]
+#  variables:
+#    CC: /usr/local/opt/llvm/bin/clang
+#    CXX: /usr/local/opt/llvm/bin/clang++
+#    BUILD_TYPE: SanitizerRelWithDebInfo
+
+catalina-brewedclang-asan-build:
+  <<: *compile_and_test_definition
+  tags: [macos, "10.15"]
+  variables:
+    CC: /usr/local/opt/llvm/bin/clang
+    CXX: /usr/local/opt/llvm/bin/clang++
+    BUILD_TYPE: SanitizerRelWithDebInfo
+
+# check if clang-format would make any changes
+clang-format:
+  tags:
+    - docker
+  stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: none
+  script:
+    - ./scripts/clang-format-all.sh
+    # check if any files are now modified and error if yes
+    - (if git diff --name-only --diff-filter=M | grep '\..pp$'; then echo $'\n    Some files are not properly formatted. You can use "./scripts/clang-format-all.sh".\n'; git diff --diff-filter=M; false; fi)
+
+pages:
+  tags:
+    - docker
+  script:
+  - doxygen
+  artifacts:
+    paths:
+    - public
+  only:
+  - master

@@ -1,0 +1,2 @@
+- git: { local-name: AndreaCensi/csm, uri: 'https://github.com/AndreaCensi/csm.git', version: master }  ## Needed for building laser_scan_matcher
+- git: { local-name: ccny-ros-pkg/scan_tools, uri: 'https://github.com/ccny-ros-pkg/scan_tools.git', version: indigo }

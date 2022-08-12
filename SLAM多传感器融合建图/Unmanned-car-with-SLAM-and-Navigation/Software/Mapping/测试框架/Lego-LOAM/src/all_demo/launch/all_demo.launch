@@ -1,0 +1,8 @@
+﻿<launch>
+  <!--起雷达驱动-->
+  <include file="$(find rslidar_sdk)/launch/start.launch" />
+  <!--起雷达话题转换节点-->
+  <node name="rs_converter" pkg="rs_to_velodyne" type="rs_to_velodyne" args="XYZIRT XYZIR"/>
+  <!--起lego_loam包-->
+  <include file="$(find lego_loam)/launch/run.launch" />
+</launch>

@@ -1,0 +1,15 @@
+%YAML:1.0
+# data
+# the tum dataset directory, change it to yours! 
+# dataset_dir: /media/xiang/Data/Dataset/Kitti/dataset/sequences/00
+dataset_dir: /home/touchair/下载/dataset/data_odometry_gray/00
+
+# camera intrinsics
+camera.fx: 517.3
+camera.fy: 516.5
+camera.cx: 325.1
+camera.cy: 249.7
+
+num_features: 150
+num_features_init: 50
+num_features_tracking: 50

@@ -1,0 +1,6 @@
+<launch>
+    <arg name="driver" default="live_slam_player"/>
+    <arg name="output" default="screen"/>
+    <node name="$(arg driver)" pkg="$(arg driver)" type="$(arg driver)" output="$(arg output)">
+    </node>
+</launch>

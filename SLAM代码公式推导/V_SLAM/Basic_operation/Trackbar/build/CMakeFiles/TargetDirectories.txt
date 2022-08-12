@@ -1,0 +1,3 @@
+/home/kali/kaka/MyGithub/V_SLAM/Basic_operaion/Trackbar/build/CMakeFiles/edit_cache.dir
+/home/kali/kaka/MyGithub/V_SLAM/Basic_operaion/Trackbar/build/CMakeFiles/rebuild_cache.dir
+/home/kali/kaka/MyGithub/V_SLAM/Basic_operaion/Trackbar/build/CMakeFiles/imageBasics.dir

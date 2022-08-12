@@ -1,0 +1,4 @@
+<launch>
+    <rosparam file="$(find kaist2bag)/config/config.yaml" />
+    <node pkg="kaist2bag" type="kaist2bag" name="$(anon kaist2bag)" output="screen" />
+</launch>

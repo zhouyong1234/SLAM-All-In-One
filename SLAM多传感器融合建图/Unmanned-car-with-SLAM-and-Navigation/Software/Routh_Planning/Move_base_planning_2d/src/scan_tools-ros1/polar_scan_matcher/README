@@ -1,0 +1,6 @@
+A Polar Scan Matcher [1] package for ROS. The package can be used to produce a 
+pose estimate for a robot when no odometry is available.
+
+[1] A. Diosi and L. Kleeman, "Laser Scan Matching in Polar Coordinates with 
+Application to SLAM " Proceedings of 2005 IEEE/RSJ International Conference 
+on Intelligent Robots and Systems, August, 2005, Edmonton, Canada

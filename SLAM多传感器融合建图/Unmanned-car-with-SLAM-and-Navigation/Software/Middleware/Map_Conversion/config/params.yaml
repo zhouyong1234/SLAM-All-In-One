@@ -1,0 +1,6 @@
+Global_file_directory: /home/touchair/filtered_map.pcd   #全局地图文件位置
+local_cloud_frame:  /velodyne_points     #局部雷达原始帧话题 (/laser_cloud_map)
+global_z: "0"       #这两个参数是调整栅格地图的Z轴直通滤波的范围
+local_z: "0.27"
+
+

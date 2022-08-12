@@ -1,0 +1,7 @@
+<launch>
+    <!-- <node pkg="map_conversion" type="local_environment_node" name="local_environment" output="screen" /> -->
+    <!-- <node pkg="map_conversion" type="global_submap_node" name="global_submap" output="screen" /> -->
+
+    
+    <node pkg="rviz" type="rviz" name="rviz" args="-d $(find map_conversion)/config/rviz_test.rviz" />
+</launch>
