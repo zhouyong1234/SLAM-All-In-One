@@ -1,0 +1,6 @@
+make --dry-run --keep-going --print-directory
+make: Entering directory '/home/touchair/gnss_ws/src/SLAM多传感器融合建图/VINS-GPS'
+make: Leaving directory '/home/touchair/gnss_ws/src/SLAM多传感器融合建图/VINS-GPS'
+ 
+make: *** No targets specified and no makefile found.  Stop.
+

@@ -1,0 +1,11 @@
+# correspondence estimation params
+teaser/cross_check: False
+teaser/tuple_test: False
+teaser/tuple_scale: 0.95
+
+# transformation estimation params
+teaser/noise_bound: 0.5
+teaser/cbar2: 1.0
+teaser/rotation_max_iterations: 100
+teaser/rotation_gnc_factor: 1.4
+teaser/rotation_cost_threshold: 0.005

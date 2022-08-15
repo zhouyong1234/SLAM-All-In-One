@@ -1,0 +1,6 @@
+# BBS, FPFH_RANSAC, FPFH_TEASER
+global_localization_engine: BBS
+
+# downsampling for global map and query cloud
+globalmap_downsample_resolution: 0.5
+query_downsample_resolution: 0.5

@@ -1,0 +1,5 @@
+bool utm
+float32 resolution
+string destination
+---
+bool success

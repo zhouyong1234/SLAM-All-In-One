@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/zhouyuxuan/catkin_ws/src/msckf_vio_GPS/tools/registration.cpp
+opencv2/core.hpp
+-
+opencv2/opencv.hpp
+-
+iomanip
+-
+iostream
+-
+vector
+-
+utility
+-
+

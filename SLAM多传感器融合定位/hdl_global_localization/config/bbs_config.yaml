@@ -1,0 +1,25 @@
+bbs/max_range: 15.0
+
+# transformation search range
+bbs/min_tx: -50.0
+bbs/max_tx: 50.0
+bbs/min_ty: -50.0
+bbs/max_ty: 50.0
+bbs/min_theta: -3.15
+bbs/max_theta: 3.15
+
+# global map config
+# slice height range (map coordinate)
+bbs/map_min_z: 2.0
+bbs/map_max_z: 2.4
+# 2D map params
+bbs/map_width: 512
+bbs/map_height: 1024
+bbs/map_resolution: 0.5
+bbs/max_points_per_cell: 5
+# precomp map pyramid
+bbs/map_pyramid_level: 6
+
+# scan slice height range (sensor coordinate)
+bbs/scan_min_z: -0.2
+bbs/scan_max_z: 0.2

@@ -1,0 +1,52 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+#output directories
+build
+bin
+.vscode/ipch
+
+#log & data
+*.log
+*.ini
+*.bin
+log
+launch.json
+*.gz
+*.zip
+*.rar
+alignmentdata
+*.png
+*.csv
+result
+sim_data
+kitti
+grc
+grc-vio
+apaper_config

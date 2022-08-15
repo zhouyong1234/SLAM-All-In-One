@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>hdl_graph_slam</name>
+  <version>0.0.0</version>
+  <description>The hdl_graph_slam package</description>
+
+  <maintainer email="koide@aisl.cs.tut.ac.jp">koide</maintainer>
+
+  <license>BSD</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>libg2o</build_depend>
+  <build_depend>message_generation</build_depend>
+  <depend>eigen</depend>
+  <depend>fast_gicp</depend>
+  <depend>geodesy</depend>
+  <depend>geometry_msgs</depend>
+  <depend>interactive_markers</depend>
+  <depend>ndt_omp</depend>
+  <depend>nmea_msgs</depend>
+  <depend>pcl_ros</depend>
+  <depend>roscpp</depend>
+  <depend>rospy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>tf_conversions</depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>msf_updates</exec_depend>
+  <exec_depend>nodelet</exec_depend>
+  <exec_depend>tf</exec_depend>
+
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-scipy</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-scipy</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-progressbar</exec_depend>
+  <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-progressbar</exec_depend>
+
+  <export>
+    <nodelet plugin="${prefix}/nodelet_plugins.xml" />
+    <!-- <nodelet plugin="${prefix}/nodelets.xml"/> -->
+  </export>
+
+
+</package>

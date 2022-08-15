@@ -1,0 +1,27 @@
+<launch>
+    <!-- <param name="acc_noise"       type="double" value="0.01193226198" />
+    <param name="gyro_noise"      type="double" value="0.00249210429305" />
+    <param name="acc_bias_noise"  type="double" value="0.000685844067113" />
+    <param name="gyro_bias_noise" type="double" value="1.64026486406e-05" /> -->
+
+
+    <param name="acc_noise"       type="double" value="2.2981210818672323e-02" />
+    <param name="gyr_noise"       type="double" value="8.1691132181374842e-04" />
+    <param name="acc_bias_noise"  type="double" value="4.9079827305826033e-04" />
+    <param name="gyr_bias_noise"  type="double" value="3.4016185378215482e-06" />
+
+    <param name="I_p_Gps_x"       type="double" value="0.0" />
+    <param name="I_p_Gps_y"       type="double" value="0.0" />
+    <param name="I_p_Gps_z"       type="double" value="0.0" />
+
+    <param name="log_folder"      type="string" value="$(find imu_gps_localization)/results" />
+
+    <!-- <node name="nmea_topic_driver" pkg="nmea_navsat_driver" type="nmea_topic_driver" output="screen" /> -->
+
+    <node name="imu_gps_localization_node" pkg="imu_gps_localization" type="imu_gps_localization_node" output="screen" />
+
+    <node pkg="rviz" type="rviz" name="rviz" output="screen" 
+      args="-d $(find imu_gps_localization)/ros_wrapper/rviz/default.rviz" required="true">
+    </node>
+
+</launch>

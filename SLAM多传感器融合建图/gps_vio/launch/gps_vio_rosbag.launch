@@ -1,0 +1,20 @@
+<launch>
+	<!-- parameters -->
+	<!--arg name="mav_name" default="iris"/ -->
+
+	<param name="use_sim_time" value="true"/>
+
+	<node name="GPSVIO_ros_node" pkg="gps_vio" type="GPSVIO_ros_node" output="screen">
+		<remap from="/vio/odom" to="/camera/odom/sample"/>
+		<remap from="/gps/odom" to="/mavros/odometry/in"/>
+	</node>
+
+	<!--node pkg="tf" type="static_transform_publisher" name="t265_broadcaster" args="-0.0388133 -0.0619189 -0.0437621 0 0 -0.8509035 0.525322 map camera_odom_frame 10" /-->
+
+	<node pkg="rosbag" type="play" name="rosbag" args="--clock -l /home/zhiang/catkin_ws/gps_vio.bag">
+		<remap from="/gpsvio/odom" to="/odom"/>
+	</node>
+
+	<node pkg="rviz" type="rviz" name="rviz" output="screen"/>
+
+</launch>

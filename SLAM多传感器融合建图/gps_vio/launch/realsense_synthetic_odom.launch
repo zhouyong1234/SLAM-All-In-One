@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+	<include file="$(find realsense2_camera)/launch/rs_t265.launch" />
+
+	<node name="odom_synthesizer" pkg="gps_vio" type="odom_synthesizer.py" output="screen">
+		<remap from="/vio/odom" to="/camera/odom/sample"/>
+	</node>
+
+	<node type="rviz" name="rviz" pkg="rviz" args="-d $(find gps_vio)/config/gps_vio.rviz" />
+
+	<node pkg="gps_vio" type="calibrator.py" name="calibrator" output="screen">
+		<remap from="/vio/odom" to="/camera/odom/sample"/>
+	</node>
+</launch>

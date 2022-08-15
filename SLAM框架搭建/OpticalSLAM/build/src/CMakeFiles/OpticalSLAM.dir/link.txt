@@ -1,0 +1,2 @@
+/usr/bin/ar qc libOpticalSLAM.a  CMakeFiles/OpticalSLAM.dir/OpticalSLAM.cpp.o CMakeFiles/OpticalSLAM.dir/StateEstimator.cpp.o CMakeFiles/OpticalSLAM.dir/ImageManager.cpp.o CMakeFiles/OpticalSLAM.dir/params.cpp.o
+/usr/bin/ranlib libOpticalSLAM.a

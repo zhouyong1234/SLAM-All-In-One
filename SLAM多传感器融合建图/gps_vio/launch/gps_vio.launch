@@ -1,0 +1,12 @@
+<launch>
+	<!-- parameters -->
+	<!--arg name="mav_name" default="iris"/ -->
+
+	<node name="GPSVIO_ros_node" pkg="gps_vio" type="GPSVIO_ros_node" output="screen">
+		<remap from="/vio/odom" to="/camera/odom/sample"/>
+		<remap from="/gps/odom" to="/mavros/odometry/in"/>
+	</node>
+
+	<node pkg="tf" type="static_transform_publisher" name="t265_broadcaster" args="-0.0568776 -0.073751 -0.0330046 -0.0217089 -0.0283208 -0.4023 0.914812 camera_odom_frame map 10" />
+
+</launch>

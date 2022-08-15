@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="rs_to_velodyne" name="rs_to_velodyne" type="rs_to_velodyne"  args="XYZI"   output="screen">
+  </node>
+</launch>

@@ -1,0 +1,42 @@
+<launch>
+    <arg name="rviz" default="true"/>
+    <arg name="est" default="ukf"/>
+
+    <arg name="calibration_file" default="$(find imu_x_fusion)/config/camchain-imucam-euroc.yaml" />
+
+    <param name="acc_noise"       type="double" value="0.08" />
+    <param name="gyr_noise"       type="double" value="0.004" />
+    <param name="acc_bias_noise"  type="double" value="0.00004" />
+    <param name="gyr_bias_noise"  type="double" value="2.0e-6" />
+
+    <param name="init_sigma_pv"   type="double" value="0.01" />
+    <param name="init_sigma_rp"   type="double" value="0.01" />
+    <param name="init_sigma_yaw"  type="double" value="5.0" />
+
+    <param name="topic_vo" value="/pose_orbslam" />
+    <param name="topic_imu" value="/imu0" />
+    
+    <group if="$(eval est == 'ekf')">
+      <node name="imu_vo_ekf_node" pkg="imu_x_fusion" type="imu_vo_ekf_node" output="screen">
+        <rosparam command="load" file="$(arg calibration_file)"/>
+      </node>
+    </group>
+
+    <group if="$(eval est == 'ukf')">
+      <node name="imu_vo_ukf_node" pkg="imu_x_fusion" type="imu_vo_ukf_node" output="screen">
+        <rosparam command="load" file="$(arg calibration_file)"/>
+      </node>
+    </group>    
+
+    <group if="$(eval est == 'map')">
+      <node name="imu_vo_map_node" pkg="imu_x_fusion" type="imu_vo_map_node" output="screen">
+        <rosparam command="load" file="$(arg calibration_file)"/>
+      </node>
+    </group>   
+
+    <group if="$(arg rviz)">
+      <node pkg="rviz" type="rviz" name="rviz" output="screen" 
+        args="-d $(find imu_x_fusion)/rviz/imu_vo_fusion.rviz" required="true">
+      </node>
+    </group>
+</launch>
